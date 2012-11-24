@@ -26,7 +26,6 @@ public enum ActionManager {
 				if (Action.class.isAssignableFrom(actionClass)) {
 					Object instance = actionClass.newInstance();
 					Action action = (Action) instance;
-					injectActionDependencies(action);
 					return action;
 				} else {
 					throw new IllegalArgumentException("Class " + className + " in not a " + Action.class.getName());
@@ -43,16 +42,6 @@ public enum ActionManager {
 			return new VanillaAction(ch.blinkenlights.android.vanilla.Action.valueOf(vanillaActionName));
 		} else {
 			throw new IllegalArgumentException("Can't recognize action: " + settingsName);
-		}
-	}
-
-	private void injectActionDependencies(Action action) {
-		if (action instanceof FullPlaybackActivityAwareAction) {
-			((FullPlaybackActivityAwareAction)action).setFullPlaybackActivity(ComponentResolver.getFullPlaybackActivity());
-			return;
-		}
-		if (action instanceof PlaybackActivityAwareAction) {
-			((PlaybackActivityAwareAction)action).setPlaybackActivity(ComponentResolver.getFullPlaybackActivity());
 		}
 	}
 }

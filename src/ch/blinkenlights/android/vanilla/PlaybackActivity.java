@@ -24,6 +24,9 @@ package ch.blinkenlights.android.vanilla;
 
 import eugene.gestures.BasicGesture;
 import eugene.gestures.Stroke;
+import eugene.gestures.action.VanillaAction;
+import eugene.gestures.listener.ActionMapGestureListener;
+import eugene.gestures.listener.GestureListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -77,6 +80,8 @@ public abstract class PlaybackActivity extends Activity implements
 	protected int mState;
 	private long mLastStateEvent;
 	private long mLastSongEvent;
+	
+	protected GestureListener mGestureListener;
 
 	@Override
 	public void onCreate(Bundle state) {
@@ -115,6 +120,11 @@ public abstract class PlaybackActivity extends Activity implements
 				Action.Nothing);
 		mDownAction = Action.getAction(prefs, PrefKeys.SWIPE_DOWN_ACTION,
 				Action.Nothing);
+		
+		ActionMapGestureListener gestureListener = new ActionMapGestureListener();
+		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.UP), new VanillaAction(mUpAction));
+		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.DOWN), new VanillaAction(mDownAction));
+		mGestureListener = gestureListener;
 
 		Window window = getWindow();
 		if (prefs.getBoolean(PrefKeys.DISABLE_LOCKSCREEN, false))
@@ -375,20 +385,21 @@ public abstract class PlaybackActivity extends Activity implements
 
 	@Override
 	public void gesture(BasicGesture gesture) {
-		if (gesture.equals(BasicGesture.valueOf(Stroke.UP))) {
-			upSwipe();
-		} else if (gesture.equals(BasicGesture.valueOf(Stroke.DOWN))) {
-			downSwipe();
-		}
+//		if (gesture.equals(BasicGesture.valueOf(Stroke.UP))) {
+//			upSwipe();
+//		} else if (gesture.equals(BasicGesture.valueOf(Stroke.DOWN))) {
+//			downSwipe();
+//		}
+		mGestureListener.onGesture(gesture);
 	}
 	
-	public void upSwipe() {
-		PlaybackService.get(this).performAction(mUpAction, this);
-	}
-
-	public void downSwipe() {
-		PlaybackService.get(this).performAction(mDownAction, this);
-	}
+//	public void upSwipe() {
+//		PlaybackService.get(this).performAction(mUpAction, this);
+//	}
+//
+//	public void downSwipe() {
+//		PlaybackService.get(this).performAction(mDownAction, this);
+//	}
 
 	private static final int GROUP_SHUFFLE = 100;
 	private static final int GROUP_FINISH = 101;

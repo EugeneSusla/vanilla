@@ -45,4 +45,21 @@ public class ActionMapGestureListener implements GestureListener {
 		}
 	}
 
+	@Override
+	public void registerActionOnGesture(BasicGesture gesture, Action action) {
+		if (gesture == null) {
+			throw new IllegalArgumentException("Registering action for gesture null");
+		}
+		if (action == null) {
+			throw new IllegalArgumentException("Registering a null action for gesture " + gesture);
+		}
+		actionMap.put(gesture, action);
+	}
+
+	@Override
+	public void registerActionOnMidwayGesture(BasicGesture gesture,
+			Action action) {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
 }

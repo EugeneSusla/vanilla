@@ -44,7 +44,8 @@ public class BasicGesture {
 		}
 		BasicGesture cachedGesture = mCache.get(strokes[0]);
 		if (cachedGesture == null) {
-			mCache.putIfAbsent(strokes[0], createNewGesture(strokes));
+			cachedGesture = createNewGesture(strokes);
+			mCache.putIfAbsent(strokes[0], cachedGesture);
 		}
 		return cachedGesture;
 	}
