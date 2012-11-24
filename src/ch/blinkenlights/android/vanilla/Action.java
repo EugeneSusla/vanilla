@@ -27,7 +27,7 @@ import android.content.SharedPreferences;
 /**
  * Various actions that can be passed to {@link PlaybackService#performAction(Action, PlaybackActivity)}.
  */
-enum Action {
+public enum Action {
 	/**
 	 * Dummy action: do nothing.
 	 */

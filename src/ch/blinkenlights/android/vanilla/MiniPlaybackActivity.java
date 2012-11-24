@@ -43,8 +43,8 @@ public class MiniPlaybackActivity extends PlaybackActivity {
 		setContentView(R.layout.mini_playback);
 
 		mCoverView = (CoverView)findViewById(R.id.cover_view);
-		mCoverView.setOnClickListener(this);
-		mCoverView.setup(mLooper, this, CoverBitmap.STYLE_OVERLAPPING_BOX);
+		getCoverView().setOnClickListener(this);
+		getCoverView().setup(mLooper, this, CoverBitmap.STYLE_OVERLAPPING_BOX);
 
 		View previousButton = findViewById(R.id.previous);
 		previousButton.setOnClickListener(this);

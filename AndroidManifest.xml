@@ -123,12 +123,12 @@ THE SOFTWARE.
 				android:name="android.appwidget.provider"
 				android:resource="@xml/widget_d" />
 		</receiver>
-		<receiver android:name="MediaButtonReceiver" >
+		<receiver android:name=".MediaButtonReceiver" >
 			<intent-filter android:priority="999">
 				<action android:name="android.intent.action.MEDIA_BUTTON" />
 			</intent-filter>
 		</receiver>
-		<service android:name="PlaybackService">
+		<service android:name=".PlaybackService">
 			<intent-filter>
 				<action android:name="ch.blinkenlights.android.vanilla.action.PLAY" />
 				<action android:name="ch.blinkenlights.android.vanilla.action.PAUSE" />
@@ -148,7 +148,7 @@ THE SOFTWARE.
 		<activity android:name="PreferencesActivity$MiscActivity" />
 		<activity android:name="PreferencesActivity$AboutActivity" />
 		<activity
-			android:name="TabOrderActivity"
+			android:name=".TabOrderActivity"
 			android:theme="@style/BackActionBar" />
 	</application>
 </manifest>

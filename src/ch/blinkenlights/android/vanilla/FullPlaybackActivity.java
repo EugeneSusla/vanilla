@@ -22,6 +22,8 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import eugene.gestures.notification.Shouter;
+import eugene.ioc.ComponentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -118,6 +120,7 @@ public class FullPlaybackActivity extends PlaybackActivity
 		super.onCreate(icicle);
 
 		setTitle(R.string.playback_view);
+		
 
 		SharedPreferences settings = PlaybackService.getSettings(this);
 		int displayMode = Integer.parseInt(settings.getString(PrefKeys.DISPLAY_MODE, "2"));
@@ -190,9 +193,15 @@ public class FullPlaybackActivity extends PlaybackActivity
 		mEndButton.setOnClickListener(this);
 		registerForContextMenu(mEndButton);
 
+		shout("Shout Test!");
+		
 		setControlsVisible(settings.getBoolean(PrefKeys.VISIBLE_CONTROLS, true));
 		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO, false));
 		setDuration(0);
+	}
+	
+	public void shout(String message) {
+		mAlbum.setText(message);
 	}
 
 	@Override
@@ -293,11 +302,11 @@ public class FullPlaybackActivity extends PlaybackActivity
 		if (mTitle != null) {
 			if (song == null) {
 				mTitle.setText(null);
-				mAlbum.setText(null);
+//				mAlbum.setText(null);
 				mArtist.setText(null);
 			} else {
 				mTitle.setText(song.title);
-				mAlbum.setText(song.album);
+//				mAlbum.setText(song.album);
 				mArtist.setText(song.artist);
 			}
 			updateQueuePosition();
@@ -309,6 +318,8 @@ public class FullPlaybackActivity extends PlaybackActivity
 		if (mExtraInfoVisible) {
 			mHandler.sendEmptyMessage(MSG_LOAD_EXTRA_INFO);
 		}
+		
+		ComponentResolver.setFullPlaybackActivity(this);
 	}
 
 	/**
@@ -463,11 +474,13 @@ public class FullPlaybackActivity extends PlaybackActivity
 	 */
 	private void setControlsVisible(boolean visible)
 	{
+		shout("setControlsVisible(" + visible + ")");
+		
 		int mode = visible ? View.VISIBLE : View.GONE;
 		mControlsTop.setVisibility(mode);
 		mControlsBottom.setVisibility(mode);
 		mControlsVisible = visible;
-
+		
 		if (visible) {
 			mPlayPauseButton.requestFocus();
 			updateElapsedTime();
@@ -481,6 +494,8 @@ public class FullPlaybackActivity extends PlaybackActivity
 	 */
 	private void setExtraInfoVisible(boolean visible)
 	{
+		shout("setExtraInfoVisible(" + visible + ")");
+		
 		TableLayout table = mInfoTable;
 		if (table == null)
 			return;
@@ -665,7 +680,7 @@ public class FullPlaybackActivity extends PlaybackActivity
 	{
 		if (view == mOverlayText && (mState & PlaybackService.FLAG_EMPTY_QUEUE) != 0) {
 			setState(PlaybackService.get(this).setFinishAction(SongTimeline.FINISH_RANDOM));
-		} else if (view == mCoverView) {
+		} else if (view == getCoverView()) {
 			performAction(mCoverPressAction);
 		} else if (view.getId() == R.id.info_table) {
 			openLibrary(mCurrentSong);

@@ -22,6 +22,8 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import eugene.gestures.BasicGesture;
+import eugene.gestures.Stroke;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,11 +50,8 @@ import android.widget.Toast;
  * communication with the PlaybackService and response to state and song
  * changes.
  */
-public abstract class PlaybackActivity extends Activity
-	implements Handler.Callback,
-	           View.OnClickListener,
-	           CoverView.Callback
-{
+public abstract class PlaybackActivity extends Activity implements
+		Handler.Callback, View.OnClickListener, CoverView.Callback {
 	private Action mUpAction;
 	private Action mDownAction;
 
@@ -80,15 +79,15 @@ public abstract class PlaybackActivity extends Activity
 	private long mLastSongEvent;
 
 	@Override
-	public void onCreate(Bundle state)
-	{
+	public void onCreate(Bundle state) {
 		super.onCreate(state);
 
 		PlaybackService.addActivity(this);
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-		HandlerThread thread = new HandlerThread(getClass().getName(), Process.THREAD_PRIORITY_LOWEST);
+		HandlerThread thread = new HandlerThread(getClass().getName(),
+				Process.THREAD_PRIORITY_LOWEST);
 		thread.start();
 
 		mLooper = thread.getLooper();
@@ -96,16 +95,14 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public void onDestroy()
-	{
+	public void onDestroy() {
 		PlaybackService.removeActivity(this);
 		mLooper.quit();
 		super.onDestroy();
 	}
 
 	@Override
-	public void onStart()
-	{
+	public void onStart() {
 		super.onStart();
 
 		if (PlaybackService.hasInstance())
@@ -114,8 +111,10 @@ public abstract class PlaybackActivity extends Activity
 			startService(new Intent(this, PlaybackService.class));
 
 		SharedPreferences prefs = PlaybackService.getSettings(this);
-		mUpAction = Action.getAction(prefs, PrefKeys.SWIPE_UP_ACTION, Action.Nothing);
-		mDownAction = Action.getAction(prefs, PrefKeys.SWIPE_DOWN_ACTION, Action.Nothing);
+		mUpAction = Action.getAction(prefs, PrefKeys.SWIPE_UP_ACTION,
+				Action.Nothing);
+		mDownAction = Action.getAction(prefs, PrefKeys.SWIPE_DOWN_ACTION,
+				Action.Nothing);
 
 		Window window = getWindow();
 		if (prefs.getBoolean(PrefKeys.DISABLE_LOCKSCREEN, false))
@@ -125,8 +124,7 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
 		MediaButtonReceiver.registerMediaButton(this);
 		MediaButtonReceiver.setInCall(false);
@@ -137,8 +135,7 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)
-	{
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_HEADSETHOOK:
 		case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
@@ -151,8 +148,7 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event)
-	{
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_HEADSETHOOK:
 		case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
@@ -165,23 +161,21 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public void shiftCurrentSong(int delta)
-	{
+	public void shiftCurrentSong(int delta) {
 		setSong(PlaybackService.get(this).shiftCurrentSong(delta));
 	}
 
-	public void playPause()
-	{
+	public void playPause() {
 		PlaybackService service = PlaybackService.get(this);
 		int state = service.playPause();
 		if ((state & PlaybackService.FLAG_ERROR) != 0)
-			Toast.makeText(this, service.getErrorMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, service.getErrorMessage(), Toast.LENGTH_LONG)
+					.show();
 		setState(state);
 	}
 
 	@Override
-	public void onClick(View view)
-	{
+	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.next:
 			shiftCurrentSong(SongTimeline.SHIFT_NEXT_SONG);
@@ -203,25 +197,33 @@ public abstract class PlaybackActivity extends Activity
 
 	/**
 	 * Called when the PlaybackService state has changed.
-	 *
-	 * @param state PlaybackService state
-	 * @param toggled The flags that have changed from the previous state
+	 * 
+	 * @param state
+	 *            PlaybackService state
+	 * @param toggled
+	 *            The flags that have changed from the previous state
 	 */
-	protected void onStateChange(int state, int toggled)
-	{
-		if ((toggled & PlaybackService.FLAG_PLAYING) != 0 && mPlayPauseButton != null) {
-			mPlayPauseButton.setImageResource((state & PlaybackService.FLAG_PLAYING) == 0 ? R.drawable.play : R.drawable.pause);
+	protected void onStateChange(int state, int toggled) {
+		if ((toggled & PlaybackService.FLAG_PLAYING) != 0
+				&& mPlayPauseButton != null) {
+			mPlayPauseButton
+					.setImageResource((state & PlaybackService.FLAG_PLAYING) == 0 ? R.drawable.play
+							: R.drawable.pause);
 		}
 		if ((toggled & PlaybackService.MASK_FINISH) != 0 && mEndButton != null) {
-			mEndButton.setImageResource(SongTimeline.FINISH_ICONS[PlaybackService.finishAction(state)]);
+			mEndButton
+					.setImageResource(SongTimeline.FINISH_ICONS[PlaybackService
+							.finishAction(state)]);
 		}
-		if ((toggled & PlaybackService.MASK_SHUFFLE) != 0 && mShuffleButton != null) {
-			mShuffleButton.setImageResource(SongTimeline.SHUFFLE_ICONS[PlaybackService.shuffleMode(state)]);
+		if ((toggled & PlaybackService.MASK_SHUFFLE) != 0
+				&& mShuffleButton != null) {
+			mShuffleButton
+					.setImageResource(SongTimeline.SHUFFLE_ICONS[PlaybackService
+							.shuffleMode(state)]);
 		}
 	}
 
-	protected void setState(final int state)
-	{
+	protected void setState(final int state) {
 		mLastStateEvent = SystemClock.uptimeMillis();
 
 		if (mState != state) {
@@ -229,8 +231,7 @@ public abstract class PlaybackActivity extends Activity
 			mState = state;
 			runOnUiThread(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					onStateChange(state, toggled);
 				}
 			});
@@ -240,18 +241,17 @@ public abstract class PlaybackActivity extends Activity
 	/**
 	 * Called by PlaybackService to update the state.
 	 */
-	public void setState(long uptime, int state)
-	{
+	public void setState(long uptime, int state) {
 		if (uptime > mLastStateEvent)
 			setState(state);
 	}
 
 	/**
-	 * Sets up components when the PlaybackService is initialized and available to
-	 * interact with. Override to implement further post-initialization behavior.
+	 * Sets up components when the PlaybackService is initialized and available
+	 * to interact with. Override to implement further post-initialization
+	 * behavior.
 	 */
-	protected void onServiceReady()
-	{
+	protected void onServiceReady() {
 		PlaybackService service = PlaybackService.get(this);
 		setSong(service.getSong(0));
 		setState(service.getState());
@@ -259,22 +259,20 @@ public abstract class PlaybackActivity extends Activity
 
 	/**
 	 * Called when the current song changes.
-	 *
-	 * @param song The new song
+	 * 
+	 * @param song
+	 *            The new song
 	 */
-	protected void onSongChange(Song song)
-	{
+	protected void onSongChange(Song song) {
 		if (mCoverView != null)
 			mCoverView.querySongs(PlaybackService.get(this));
 	}
 
-	protected void setSong(final Song song)
-	{
+	protected void setSong(final Song song) {
 		mLastSongEvent = SystemClock.uptimeMillis();
 		runOnUiThread(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				onSongChange(song);
 			}
 		});
@@ -283,8 +281,7 @@ public abstract class PlaybackActivity extends Activity
 	/**
 	 * Called by PlaybackService to update the current song.
 	 */
-	public void setSong(long uptime, Song song)
-	{
+	public void setSong(long uptime, Song song) {
 		if (uptime > mLastSongEvent)
 			setSong(song);
 	}
@@ -293,8 +290,7 @@ public abstract class PlaybackActivity extends Activity
 	 * Called by PlaybackService to update an active song (next, previous, or
 	 * current).
 	 */
-	public void replaceSong(int delta, Song song)
-	{
+	public void replaceSong(int delta, Song song) {
 		if (mCoverView != null)
 			mCoverView.setSong(delta + 1, song);
 	}
@@ -302,15 +298,13 @@ public abstract class PlaybackActivity extends Activity
 	/**
 	 * Called when the song timeline position/size has changed.
 	 */
-	public void onPositionInfoChanged()
-	{
+	public void onPositionInfoChanged() {
 	}
 
 	/**
 	 * Called when the content of the media store has changed.
 	 */
-	public void onMediaChange()
-	{
+	public void onMediaChange() {
 	}
 
 	static final int MENU_SORT = 1;
@@ -326,15 +320,14 @@ public abstract class PlaybackActivity extends Activity
 	static final int MENU_SHOW_QUEUE = 13;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		menu.add(0, MENU_PREFS, 0, R.string.settings).setIcon(R.drawable.ic_menu_preferences);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(0, MENU_PREFS, 0, R.string.settings).setIcon(
+				R.drawable.ic_menu_preferences);
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
+	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MENU_PREFS:
 			startActivity(new Intent(this, PreferencesActivity.class));
@@ -345,34 +338,31 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public boolean handleMessage(Message msg)
-	{
+	public boolean handleMessage(Message msg) {
 		return false;
 	}
 
 	/**
 	 * Cycle shuffle mode.
 	 */
-	public void cycleShuffle()
-	{
+	public void cycleShuffle() {
 		setState(PlaybackService.get(this).cycleShuffle());
 	}
 
 	/**
 	 * Cycle the finish action.
 	 */
-	public void cycleFinishAction()
-	{
+	public void cycleFinishAction() {
 		setState(PlaybackService.get(this).cycleFinishAction());
 	}
 
 	/**
 	 * Open the library activity.
-	 *
-	 * @param song If non-null, will open the library focused on this song.
+	 * 
+	 * @param song
+	 *            If non-null, will open the library focused on this song.
 	 */
-	public void openLibrary(Song song)
-	{
+	public void openLibrary(Song song) {
 		Intent intent = new Intent(this, LibraryActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		if (song != null) {
@@ -384,14 +374,19 @@ public abstract class PlaybackActivity extends Activity
 	}
 
 	@Override
-	public void upSwipe()
-	{
+	public void gesture(BasicGesture gesture) {
+		if (gesture.equals(BasicGesture.valueOf(Stroke.UP))) {
+			upSwipe();
+		} else if (gesture.equals(BasicGesture.valueOf(Stroke.DOWN))) {
+			downSwipe();
+		}
+	}
+	
+	public void upSwipe() {
 		PlaybackService.get(this).performAction(mUpAction, this);
 	}
 
-	@Override
-	public void downSwipe()
-	{
+	public void downSwipe() {
 		PlaybackService.get(this).performAction(mDownAction, this);
 	}
 
@@ -399,24 +394,31 @@ public abstract class PlaybackActivity extends Activity
 	private static final int GROUP_FINISH = 101;
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo)
-	{
+	public void onCreateContextMenu(ContextMenu menu, View view,
+			ContextMenu.ContextMenuInfo menuInfo) {
 		if (view == mShuffleButton) {
-			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_NONE, 0, R.string.no_shuffle);
-			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_SONGS, 0, R.string.shuffle_songs);
-			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_ALBUMS, 0, R.string.shuffle_albums);
+			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_NONE, 0,
+					R.string.no_shuffle);
+			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_SONGS, 0,
+					R.string.shuffle_songs);
+			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_ALBUMS, 0,
+					R.string.shuffle_albums);
 		} else if (view == mEndButton) {
-		    menu.add(GROUP_FINISH, SongTimeline.FINISH_STOP, 0, R.string.no_repeat);
-			menu.add(GROUP_FINISH, SongTimeline.FINISH_REPEAT, 0, R.string.repeat);
-			menu.add(GROUP_FINISH, SongTimeline.FINISH_REPEAT_CURRENT, 0, R.string.repeat_current_song);
-			menu.add(GROUP_FINISH, SongTimeline.FINISH_STOP_CURRENT, 0, R.string.stop_current_song);
-			menu.add(GROUP_FINISH, SongTimeline.FINISH_RANDOM, 0, R.string.random);
+			menu.add(GROUP_FINISH, SongTimeline.FINISH_STOP, 0,
+					R.string.no_repeat);
+			menu.add(GROUP_FINISH, SongTimeline.FINISH_REPEAT, 0,
+					R.string.repeat);
+			menu.add(GROUP_FINISH, SongTimeline.FINISH_REPEAT_CURRENT, 0,
+					R.string.repeat_current_song);
+			menu.add(GROUP_FINISH, SongTimeline.FINISH_STOP_CURRENT, 0,
+					R.string.stop_current_song);
+			menu.add(GROUP_FINISH, SongTimeline.FINISH_RANDOM, 0,
+					R.string.random);
 		}
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item)
-	{
+	public boolean onContextItemSelected(MenuItem item) {
 		int group = item.getGroupId();
 		int id = item.getItemId();
 		if (group == GROUP_SHUFFLE)
@@ -424,5 +426,9 @@ public abstract class PlaybackActivity extends Activity
 		else if (group == GROUP_FINISH)
 			setState(PlaybackService.get(this).setFinishAction(id));
 		return true;
+	}
+
+	public CoverView getCoverView() {
+		return mCoverView;
 	}
 }
