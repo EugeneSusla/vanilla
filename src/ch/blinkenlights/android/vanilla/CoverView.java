@@ -276,13 +276,9 @@ public final class CoverView extends View implements Handler.Callback {
 			float deltaX = mLastMotionX - x;
 			float deltaY = mLastMotionY - y;
 
-			if (mCurrentGesture != null) {
-				if (mCurrentGesture.addStroke(StrokeUtils.getStrokeFromDeltas(
-						deltaX, deltaY))) {
-					Shouter.shout(mCurrentGesture.toString());
-				}
-			} else {
-				Shouter.shout("mCurrentGesture is null on ACTION_MOVE !");
+			if (mCurrentGesture.addStroke(StrokeUtils.getStrokeFromDeltas(
+					deltaX, deltaY))) {
+				Shouter.shout(mCurrentGesture.toString());
 			}
 
 			// if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -336,9 +332,9 @@ public final class CoverView extends View implements Handler.Callback {
 				whichCover = Math.max(-1, Math.min(nearestCover, 1));
 			}
 
-//			if (whichCover != 0) {
-//				onSideSwipe(whichCover);
-//			}
+			// if (whichCover != 0) {
+			// onSideSwipe(whichCover);
+			// }
 
 			if (mVelocityTracker != null) {
 				mVelocityTracker.recycle();
@@ -351,7 +347,7 @@ public final class CoverView extends View implements Handler.Callback {
 		return true;
 	}
 
-	private void onSideSwipe(int whichCover) {
+	public void onSideSwipe(int whichCover) {
 		if (whichCover == -1 && mSongs[0] == null) {
 			return;
 		}
@@ -392,17 +388,15 @@ public final class CoverView extends View implements Handler.Callback {
 		}
 	}
 
-	// TODO Minimum time threshold
 	private void onGesture(BasicGesture gesture) {
-		Shouter.shout("Send gesture " + mCurrentGesture);
-		if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
-			onSideSwipe(1);
-			return;
-		}
-		if (gesture.equals(BasicGesture.valueOf(Stroke.RIGHT))) {
-			onSideSwipe(-1);
-			return;
-		}
+//		if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
+//			onSideSwipe(1);
+//			return;
+//		}
+//		if (gesture.equals(BasicGesture.valueOf(Stroke.RIGHT))) {
+//			onSideSwipe(-1);
+//			return;
+//		}
 		mCallback.gesture(gesture);
 	}
 

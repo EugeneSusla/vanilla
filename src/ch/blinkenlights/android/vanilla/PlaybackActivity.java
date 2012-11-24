@@ -24,7 +24,10 @@ package ch.blinkenlights.android.vanilla;
 
 import eugene.gestures.BasicGesture;
 import eugene.gestures.Stroke;
+import eugene.gestures.action.ActionManager;
 import eugene.gestures.action.VanillaAction;
+import eugene.gestures.action.impl.NextTrackAction;
+import eugene.gestures.action.impl.PreviousTrackAction;
 import eugene.gestures.listener.ActionMapGestureListener;
 import eugene.gestures.listener.GestureListener;
 import android.app.Activity;
@@ -122,8 +125,10 @@ public abstract class PlaybackActivity extends Activity implements
 				Action.Nothing);
 		
 		ActionMapGestureListener gestureListener = new ActionMapGestureListener();
-		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.UP), new VanillaAction(mUpAction));
-		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.DOWN), new VanillaAction(mDownAction));
+		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.UP), ActionManager.INSTANCE.getVanillaAction(mUpAction));
+		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.DOWN), ActionManager.INSTANCE.getVanillaAction(mDownAction));
+		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.LEFT), ActionManager.INSTANCE.getActionInstance(NextTrackAction.class));
+		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.RIGHT), ActionManager.INSTANCE.getActionInstance(PreviousTrackAction.class));
 		mGestureListener = gestureListener;
 
 		Window window = getWindow();

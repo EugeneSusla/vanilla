@@ -7,7 +7,7 @@ import eugene.gestures.notification.ShoutNotificationImpl;
 public enum Config {
 	INSTANCE;
 	
-	private int gestureStrokeMinPixelThreshold = 15;
+	private int gestureStrokeMinPixelThreshold = 10;
 	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl("Unrecognized Gesture");
 
 	public int getGestureStrokeMinPixelThreshold() {

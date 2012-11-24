@@ -193,8 +193,6 @@ public class FullPlaybackActivity extends PlaybackActivity
 		mEndButton.setOnClickListener(this);
 		registerForContextMenu(mEndButton);
 
-		shout("Shout Test!");
-		
 		setControlsVisible(settings.getBoolean(PrefKeys.VISIBLE_CONTROLS, true));
 		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO, false));
 		setDuration(0);
@@ -474,8 +472,6 @@ public class FullPlaybackActivity extends PlaybackActivity
 	 */
 	private void setControlsVisible(boolean visible)
 	{
-		shout("setControlsVisible(" + visible + ")");
-		
 		int mode = visible ? View.VISIBLE : View.GONE;
 		mControlsTop.setVisibility(mode);
 		mControlsBottom.setVisibility(mode);
@@ -494,8 +490,6 @@ public class FullPlaybackActivity extends PlaybackActivity
 	 */
 	private void setExtraInfoVisible(boolean visible)
 	{
-		shout("setExtraInfoVisible(" + visible + ")");
-		
 		TableLayout table = mInfoTable;
 		if (table == null)
 			return;
