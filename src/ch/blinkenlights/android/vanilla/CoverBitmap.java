@@ -22,13 +22,17 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import eugene.config.Config;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Paint.Cap;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -40,19 +44,25 @@ import android.util.TypedValue;
  * album art.
  */
 public final class CoverBitmap {
+
 	/**
 	 * Draw cover in background and a box with song info on top.
 	 */
 	public static final int STYLE_OVERLAPPING_BOX = 0;
 	/**
-	 * Draw cover on top or left with song info on bottom or right (depending
-	 * on orientation).
+	 * Draw cover on top or left with song info on bottom or right (depending on
+	 * orientation).
 	 */
 	public static final int STYLE_INFO_BELOW = 1;
 	/**
 	 * Draw no song info, only the cover.
 	 */
 	public static final int STYLE_NO_INFO = 2;
+	/**
+	 * Draw cover in background and a box with song info on top of the fallback
+	 * cover. Uses an offset to not draw on top of the fallback cover
+	 */
+	public static final int STYLE_OVERLAPPING_BOX_FOR_DEFAULT_COVER = 3;
 
 	private static int TEXT_SIZE = -1;
 	private static int TEXT_SIZE_BIG;
@@ -64,48 +74,63 @@ public final class CoverBitmap {
 
 	/**
 	 * Initialize the regular text size members.
-	 *
-	 * @param context A context to use.
+	 * 
+	 * @param context
+	 *            A context to use.
 	 */
-	private static void loadTextSizes(Context context)
-	{
+	private static void loadTextSizes(Context context) {
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-		TEXT_SIZE = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, metrics);
-		TEXT_SIZE_BIG = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, metrics);
-		PADDING = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, metrics);
-		TEXT_SPACE = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, metrics);
+		TEXT_SIZE = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, 14, metrics);
+		TEXT_SIZE_BIG = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, 20, metrics);
+		PADDING = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+				10, metrics);
+		TEXT_SPACE = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, 150, metrics);
 	}
 
 	/**
 	 * Initialize the icon bitmaps.
-	 *
-	 * @param context A context to use.
+	 * 
+	 * @param context
+	 *            A context to use.
 	 */
-	private static void loadIcons(Context context)
-	{
+	private static void loadIcons(Context context) {
 		Resources res = context.getResources();
-		SONG_ICON = BitmapFactory.decodeResource(res, R.drawable.ic_tab_songs_selected);
-		ALBUM_ICON = BitmapFactory.decodeResource(res, R.drawable.ic_tab_albums_selected);
-		ARTIST_ICON = BitmapFactory.decodeResource(res, R.drawable.ic_tab_artists_selected);
+		SONG_ICON = BitmapFactory.decodeResource(res,
+				R.drawable.ic_tab_songs_selected);
+		ALBUM_ICON = BitmapFactory.decodeResource(res,
+				R.drawable.ic_tab_albums_selected);
+		ARTIST_ICON = BitmapFactory.decodeResource(res,
+				R.drawable.ic_tab_artists_selected);
 	}
 
 	/**
 	 * Helper function to draw text within a set width
-	 *
-	 * @param canvas The canvas to draw to
-	 * @param text The text to draw
-	 * @param left The x coordinate of the left edge of the text
-	 * @param top The y coordinate of the top edge of the text
-	 * @param width The measured width of the text
-	 * @param maxWidth The maximum width of the text. Text outside of this width
-	 * will be truncated.
-	 * @param paint The paint style to use
+	 * 
+	 * @param canvas
+	 *            The canvas to draw to
+	 * @param text
+	 *            The text to draw
+	 * @param left
+	 *            The x coordinate of the left edge of the text
+	 * @param top
+	 *            The y coordinate of the top edge of the text
+	 * @param width
+	 *            The measured width of the text
+	 * @param maxWidth
+	 *            The maximum width of the text. Text outside of this width will
+	 *            be truncated.
+	 * @param paint
+	 *            The paint style to use
 	 */
-	private static void drawText(Canvas canvas, String text, int left, int top, int width, int maxWidth, Paint paint)
-	{
+	private static void drawText(Canvas canvas, String text, int left, int top,
+			int width, int maxWidth, Paint paint) {
 		canvas.save();
 		int offset = Math.max(0, maxWidth - width) / 2;
-		canvas.clipRect(left, top, left + maxWidth, top + paint.getTextSize() * 2);
+		canvas.clipRect(left, top, left + maxWidth, top + paint.getTextSize()
+				* 2);
 		canvas.drawText(text, left + offset, top - paint.ascent(), paint);
 		canvas.restore();
 	}
@@ -113,32 +138,48 @@ public final class CoverBitmap {
 	/**
 	 * Create an image representing the given song. Includes cover art and
 	 * possibly song title/artist/ablum, depending on the given style.
-	 *
-	 * @param context A context to use.
-	 * @param style One of CoverBitmap.STYLE_*
-	 * @param coverArt The cover art for the song.
-	 * @param song Title and other data are taken from here for info modes.
-	 * @param width Maximum width of image
-	 * @param height Maximum height of image
-	 * @return The image, or null if the song was null, or width or height
-	 * were less than 1
+	 * 
+	 * @param context
+	 *            A context to use.
+	 * @param style
+	 *            One of CoverBitmap.STYLE_*
+	 * @param coverArt
+	 *            The cover art for the song.
+	 * @param song
+	 *            Title and other data are taken from here for info modes.
+	 * @param width
+	 *            Maximum width of image
+	 * @param height
+	 *            Maximum height of image
+	 * @return The image, or null if the song was null, or width or height were
+	 *         less than 1
 	 */
-	public static Bitmap createBitmap(Context context, int style, Bitmap coverArt, Song song, int width, int height)
-	{
+	public static Bitmap createBitmap(Context context, int style,
+			Bitmap coverArt, Song song, int width, int height) {
 		switch (style) {
 		case STYLE_OVERLAPPING_BOX:
-			return createOverlappingBitmap(context, coverArt, song, width, height);
+			return createOverlappingBitmap(context, coverArt, song, width,
+					height);
+		case STYLE_OVERLAPPING_BOX_FOR_DEFAULT_COVER:
+			return createOverlappingBitmap(context, coverArt, song, width,
+					height, Config.INSTANCE.getDefaultCoverLeftOffset());
 		case STYLE_INFO_BELOW:
 			return createSeparatedBitmap(context, coverArt, song, width, height);
 		case STYLE_NO_INFO:
 			return createScaledBitmap(coverArt, width, height);
 		default:
-			throw new IllegalArgumentException("Invalid bitmap type given: " + style);
+			throw new IllegalArgumentException("Invalid bitmap type given: "
+					+ style);
 		}
 	}
 
-	private static Bitmap createOverlappingBitmap(Context context, Bitmap cover, Song song, int width, int height)
-	{
+	private static Bitmap createOverlappingBitmap(Context context,
+			Bitmap cover, Song song, int width, int height) {
+		return createOverlappingBitmap(context, cover, song, width, height, 0f);
+	}
+
+	private static Bitmap createOverlappingBitmap(Context context,
+			Bitmap cover, Song song, int width, int height, float boxOffset) {
 		if (TEXT_SIZE == -1)
 			loadTextSizes(context);
 
@@ -154,12 +195,15 @@ public final class CoverBitmap {
 		int padding = PADDING;
 
 		paint.setTextSize(titleSize);
-		int titleWidth = (int)paint.measureText(title);
+		int titleWidth = (int) paint.measureText(title);
 		paint.setTextSize(subSize);
-		int albumWidth = (int)paint.measureText(album);
-		int artistWidth = (int)paint.measureText(artist);
+		int albumWidth = (int) paint.measureText(album);
+		int artistWidth = (int) paint.measureText(artist);
 
-		int boxWidth = Math.min(width, Math.max(titleWidth, Math.max(artistWidth, albumWidth)) + padding * 2);
+		int maxBoxWidth = (int) (width * (1f - 2f * boxOffset));
+		int boxWidth = Math.min(maxBoxWidth,
+				Math.max(titleWidth, Math.max(artistWidth, albumWidth))
+						+ padding * 2);
 		int boxHeight = Math.min(height, titleSize + subSize * 2 + padding * 4);
 
 		int coverWidth;
@@ -172,7 +216,8 @@ public final class CoverBitmap {
 			coverWidth = cover.getWidth();
 			coverHeight = cover.getHeight();
 
-			float scale = Math.min((float)width / coverWidth, (float)height / coverHeight);
+			float scale = Math.min((float) width / coverWidth, (float) height
+					/ coverHeight);
 
 			coverWidth *= scale;
 			coverHeight *= scale;
@@ -181,7 +226,8 @@ public final class CoverBitmap {
 		int bitmapWidth = Math.max(coverWidth, boxWidth);
 		int bitmapHeight = Math.max(coverHeight, boxHeight);
 
-		Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.RGB_565);
+		Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight,
+				Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(bitmap);
 
 		if (cover != null) {
@@ -217,8 +263,8 @@ public final class CoverBitmap {
 		return bitmap;
 	}
 
-	private static Bitmap createSeparatedBitmap(Context context, Bitmap cover, Song song, int width, int height)
-	{
+	private static Bitmap createSeparatedBitmap(Context context, Bitmap cover,
+			Song song, int width, int height) {
 		if (TEXT_SIZE == -1)
 			loadTextSizes(context);
 		if (SONG_ICON == null)
@@ -247,27 +293,37 @@ public final class CoverBitmap {
 			coverHeight = cover.getHeight();
 
 			int maxWidth = horizontal ? width - TEXT_SPACE : width;
-			int maxHeight = horizontal ? height : height - textSize * 3 - padding * 4;
-			float scale = Math.min((float)maxWidth / coverWidth, (float)maxHeight / coverHeight);
+			int maxHeight = horizontal ? height : height - textSize * 3
+					- padding * 4;
+			float scale = Math.min((float) maxWidth / coverWidth,
+					(float) maxHeight / coverHeight);
 
 			coverWidth *= scale;
 			coverHeight *= scale;
 		}
 
 		paint.setTextSize(textSize);
-		int titleWidth = (int)paint.measureText(title);
-		int albumWidth = (int)paint.measureText(album);
-		int artistWidth = (int)paint.measureText(artist);
+		int titleWidth = (int) paint.measureText(title);
+		int albumWidth = (int) paint.measureText(album);
+		int artistWidth = (int) paint.measureText(artist);
 
 		int maxBoxWidth = horizontal ? width - coverWidth : width;
 		int maxBoxHeight = horizontal ? height : height - coverHeight;
-		int boxWidth = Math.min(maxBoxWidth, textSize + Math.max(titleWidth, Math.max(artistWidth, albumWidth)) + padding * 3);
+		int boxWidth = Math.min(
+				maxBoxWidth,
+				textSize
+						+ Math.max(titleWidth,
+								Math.max(artistWidth, albumWidth)) + padding
+						* 3);
 		int boxHeight = Math.min(maxBoxHeight, textSize * 3 + padding * 4);
 
-		int bitmapWidth = horizontal ? coverWidth + boxWidth : Math.max(coverWidth, boxWidth);
-		int bitmapHeight = horizontal ? Math.max(coverHeight, boxHeight) : coverHeight + boxHeight;
+		int bitmapWidth = horizontal ? coverWidth + boxWidth : Math.max(
+				coverWidth, boxWidth);
+		int bitmapHeight = horizontal ? Math.max(coverHeight, boxHeight)
+				: coverHeight + boxHeight;
 
-		Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.RGB_565);
+		Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight,
+				Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(bitmap);
 
 		if (cover != null) {
@@ -292,15 +348,18 @@ public final class CoverBitmap {
 		paint.setARGB(255, 255, 255, 255);
 
 		canvas.drawBitmap(SONG_ICON, left, top, paint);
-		drawText(canvas, title, left + padding + textSize, top, maxWidth, maxWidth, paint);
+		drawText(canvas, title, left + padding + textSize, top, maxWidth,
+				maxWidth, paint);
 		top += textSize + padding;
 
 		canvas.drawBitmap(ALBUM_ICON, left, top, paint);
-		drawText(canvas, album, left + padding + textSize, top, maxWidth, maxWidth, paint);
+		drawText(canvas, album, left + padding + textSize, top, maxWidth,
+				maxWidth, paint);
 		top += textSize + padding;
 
 		canvas.drawBitmap(ARTIST_ICON, left, top, paint);
-		drawText(canvas, artist, left + padding + textSize, top, maxWidth, maxWidth, paint);
+		drawText(canvas, artist, left + padding + textSize, top, maxWidth,
+				maxWidth, paint);
 
 		return bitmap;
 	}
@@ -309,44 +368,60 @@ public final class CoverBitmap {
 	 * Scales a bitmap to fit in a rectangle of the given size. Aspect ratio is
 	 * preserved. At least one dimension of the result will match the provided
 	 * dimension exactly.
-	 *
-	 * @param source The bitmap to be scaled
-	 * @param width Maximum width of image
-	 * @param height Maximum height of image
+	 * 
+	 * @param source
+	 *            The bitmap to be scaled
+	 * @param width
+	 *            Maximum width of image
+	 * @param height
+	 *            Maximum height of image
 	 * @return The scaled bitmap.
 	 */
-	private static Bitmap createScaledBitmap(Bitmap source, int width, int height)
-	{
+	private static Bitmap createScaledBitmap(Bitmap source, int width,
+			int height) {
 		int sourceWidth = source.getWidth();
 		int sourceHeight = source.getHeight();
-		float scale = Math.min((float)width / sourceWidth, (float)height / sourceHeight);
+		float scale = Math.min((float) width / sourceWidth, (float) height
+				/ sourceHeight);
 		sourceWidth *= scale;
 		sourceHeight *= scale;
-		return Bitmap.createScaledBitmap(source, sourceWidth, sourceHeight, false);
+		return Bitmap.createScaledBitmap(source, sourceWidth, sourceHeight,
+				false);
 	}
 
 	/**
 	 * Generate the default cover (a rendition of a CD). Returns a square iamge.
 	 * Both dimensions are the lesser of width and height.
-	 *
-	 * @param width The max width
-	 * @param height The max height
+	 * 
+	 * @param width
+	 *            The max width
+	 * @param height
+	 *            The max height
 	 * @return The default cover.
 	 */
-	public static Bitmap generateDefaultCover(int width, int height)
-	{
+	public static Bitmap generateDefaultCover(int width, int height) {
 		int size = Math.min(width, height);
+
+		Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		Canvas canvas = new Canvas(bitmap);
+
+		drawCdCase(canvas, paint, size);
+
+		// drawDisc(size, paint, canvas);
+
+		return bitmap;
+	}
+
+	private static void drawDisc(int size, Paint paint, Canvas canvas) {
 		int halfSize = size / 2;
 		int eightSize = size / 8;
 
-		Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
-		LinearGradient gradient = new LinearGradient(size, 0, 0, size, 0xff646464, 0xff464646, Shader.TileMode.CLAMP);
+		LinearGradient gradient = new LinearGradient(size, 0, 0, size,
+				0xff646464, 0xff464646, Shader.TileMode.CLAMP);
 		RectF oval = new RectF(eightSize, 0, size - eightSize, size);
 
-		Paint paint = new Paint();
-		paint.setAntiAlias(true);
-
-		Canvas canvas = new Canvas(bitmap);
 		canvas.rotate(-45, halfSize, halfSize);
 
 		paint.setShader(gradient);
@@ -364,7 +439,27 @@ public final class CoverBitmap {
 		canvas.translate(size / 3, size / 3);
 		canvas.scale(0.333f, 0.333f);
 		canvas.drawOval(oval, paint);
+	}
 
-		return bitmap;
+	private static void drawCdCase(Canvas canvas, Paint paint, int size) {
+		int xStart = 2;
+		int xEnd = size - 1;
+		int x1 = (int) (size * (32f / 400f));
+		int x2 = (int) (size * Config.INSTANCE.getDefaultCoverLeftOffset());
+		int yStart = (int) (size * (23f / 400f));
+		int yEnd = (int) (size * ((23f + 353f) / 400f));
+
+		paint.setStrokeCap(Cap.ROUND);
+		paint.setStrokeWidth(3);
+
+		paint.setColor(Color.DKGRAY);
+		paint.setStyle(Style.FILL);
+		canvas.drawRect(xStart, yStart, x1, yEnd, paint);
+
+		paint.setColor(Color.GRAY);
+		paint.setStyle(Style.STROKE);
+		canvas.drawRect(xStart, yStart, xEnd, yEnd, paint);
+		canvas.drawRect(xStart, yStart, x1, yEnd, paint);
+		canvas.drawRect(x2, yStart, xEnd, yEnd, paint);
 	}
 }

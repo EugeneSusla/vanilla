@@ -225,14 +225,22 @@ public final class CoverView extends View implements Handler.Callback {
 
 		canvas.drawColor(Color.BLACK);
 
-		for (Bitmap bitmap : mActiveBitmaps) {
+		// for (Bitmap bitmap : mActiveBitmaps) {
+		for (int i = 0; i < mActiveBitmaps.length; i++) {
+			Bitmap bitmap = mActiveBitmaps[i];
 			if (bitmap != null && scrollX + width > x && scrollX < x + width) {
 				int xOffset = (width - bitmap.getWidth()) / 2;
 				int yOffset = (height - bitmap.getHeight()) / 2;
-				canvas.drawBitmap(bitmap, x + xOffset - scrollX, yOffset, null);
+				int bitmapX = x + xOffset - scrollX;
+				drawAlbumArt(canvas, bitmap, mSongs[i], bitmapX, yOffset);
 			}
 			x += width;
 		}
+	}
+
+	private void drawAlbumArt(Canvas canvas, Bitmap bitmap, Song song, int x,
+			int y) {
+		canvas.drawBitmap(bitmap, x, y, null);
 	}
 
 	/**
@@ -389,14 +397,14 @@ public final class CoverView extends View implements Handler.Callback {
 	}
 
 	private void onGesture(BasicGesture gesture) {
-//		if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
-//			onSideSwipe(1);
-//			return;
-//		}
-//		if (gesture.equals(BasicGesture.valueOf(Stroke.RIGHT))) {
-//			onSideSwipe(-1);
-//			return;
-//		}
+		// if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
+		// onSideSwipe(1);
+		// return;
+		// }
+		// if (gesture.equals(BasicGesture.valueOf(Stroke.RIGHT))) {
+		// onSideSwipe(-1);
+		// return;
+		// }
 		mCallback.gesture(gesture);
 	}
 
@@ -419,7 +427,9 @@ public final class CoverView extends View implements Handler.Callback {
 				mDefaultCover = def = CoverBitmap.generateDefaultCover(
 						getWidth(), getHeight());
 			}
-			mBitmaps[i] = def;
+			mBitmaps[i] = CoverBitmap.createBitmap(context,
+					CoverBitmap.STYLE_OVERLAPPING_BOX_FOR_DEFAULT_COVER, def,
+					song, getWidth(), getHeight());
 		} else {
 			mBitmaps[i] = CoverBitmap.createBitmap(context, style, cover, song,
 					getWidth(), getHeight());

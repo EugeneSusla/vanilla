@@ -9,6 +9,8 @@ public enum Config {
 	
 	private int gestureStrokeMinPixelThreshold = 10;
 	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl("Unrecognized Gesture");
+	
+	private float defaultCoverLeftOffset = 36f/400f;
 
 	public int getGestureStrokeMinPixelThreshold() {
 		return gestureStrokeMinPixelThreshold;
@@ -26,5 +28,13 @@ public enum Config {
 	public void setUnrecognisedGestureNotification(
 			ShoutNotification unrecognisedGestureNotification) {
 		this.unrecognisedGestureNotification = unrecognisedGestureNotification;
+	}
+
+	public float getDefaultCoverLeftOffset() {
+		return defaultCoverLeftOffset;
+	}
+
+	public void setDefaultCoverLeftOffset(float defaultCoverLeftOffset) {
+		this.defaultCoverLeftOffset = defaultCoverLeftOffset;
 	}
 }
