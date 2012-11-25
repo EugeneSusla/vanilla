@@ -478,7 +478,9 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		int mode = visible ? View.VISIBLE : View.GONE;
 		mControlsTop.setVisibility(mode);
 		mControlsBottom.setVisibility(mode);
-		mInfoTable.setVisibility(mode);
+		if (mInfoTable != null) {
+			mInfoTable.setVisibility(mode);
+		}
 		mControlsVisible = visible;
 		boolean lowProfileToggleEnabled = Config.INSTANCE
 				.isUseLowProfileInCompactMode();

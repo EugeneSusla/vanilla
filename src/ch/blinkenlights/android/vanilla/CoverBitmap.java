@@ -180,32 +180,9 @@ public final class CoverBitmap {
 
 	private static Bitmap createOverlappingBitmap(Context context,
 			Bitmap cover, Song song, int width, int height, float boxOffset) {
-		if (TEXT_SIZE == -1)
-			loadTextSizes(context);
+		
 
-		Paint paint = new Paint();
-		paint.setAntiAlias(true);
-
-		String title = song.title == null ? "" : song.title;
-		String album = song.album == null ? "" : song.album;
-		String artist = song.artist == null ? "" : song.artist;
-
-		int titleSize = TEXT_SIZE_BIG;
-		int subSize = TEXT_SIZE;
-		int padding = PADDING;
-
-		paint.setTextSize(titleSize);
-		int titleWidth = (int) paint.measureText(title);
-		paint.setTextSize(subSize);
-		int albumWidth = (int) paint.measureText(album);
-		int artistWidth = (int) paint.measureText(artist);
-
-		int maxBoxWidth = (int) (width * (1f - 2f * boxOffset));
-		int boxWidth = Math.min(maxBoxWidth,
-				Math.max(titleWidth, Math.max(artistWidth, albumWidth))
-						+ padding * 2);
-		int boxHeight = Math.min(height, titleSize + subSize * 2 + padding * 4);
-
+		/* cover dimensions phase starts */
 		int coverWidth;
 		int coverHeight;
 
@@ -222,9 +199,15 @@ public final class CoverBitmap {
 			coverWidth *= scale;
 			coverHeight *= scale;
 		}
+		/* cover dimensions phase ends */
 
-		int bitmapWidth = Math.max(coverWidth, boxWidth);
-		int bitmapHeight = Math.max(coverHeight, boxHeight);
+		Paint paint = initDrawing(context);
+		
+		Rect textBoxDimensions = measureTextBox(song, (int) (width * (1f - 2f * boxOffset)), height,
+				paint);
+
+		int bitmapWidth = Math.max(coverWidth, textBoxDimensions.right);
+		int bitmapHeight = Math.max(coverHeight, textBoxDimensions.bottom);
 
 		Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight,
 				Bitmap.Config.RGB_565);
@@ -237,30 +220,84 @@ public final class CoverBitmap {
 			canvas.drawBitmap(cover, null, rect, paint);
 		}
 
-		int left = (bitmapWidth - boxWidth) / 2;
-		int top = (bitmapHeight - boxHeight) / 2;
-		int right = (bitmapWidth + boxWidth) / 2;
-		int bottom = (bitmapHeight + boxHeight) / 2;
+		drawSongInfo(song, paint, textBoxDimensions, bitmapWidth, bitmapHeight,
+				canvas);
+
+		return bitmap;
+	}
+
+	private static Paint initDrawing(Context context) {
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		if (TEXT_SIZE == -1)
+			loadTextSizes(context);
+		return paint;
+	}
+
+	private static void drawSongInfo(Song song, Paint paint,
+			Rect textBoxDimensions, int availableWidth, int availableHeight,
+			Canvas canvas) {
+		int left = (availableWidth - textBoxDimensions.right) / 2;
+		int top = (availableHeight - textBoxDimensions.bottom) / 2;
+		int right = (availableWidth + textBoxDimensions.right) / 2;
+		int bottom = (availableHeight + textBoxDimensions.bottom) / 2;
 
 		paint.setARGB(150, 0, 0, 0);
 		canvas.drawRect(left, top, right, bottom, paint);
 
-		int maxWidth = boxWidth - padding * 2;
+		int maxWidth = textBoxDimensions.right - PADDING * 2;
 		paint.setARGB(255, 255, 255, 255);
-		top += padding;
-		left += padding;
+		top += PADDING;
+		left += PADDING;
 
-		paint.setTextSize(titleSize);
+		String title = getSontTitle(song);
+		String album = getSongAlbum(song);
+		String artist = getSongArtist(song);
+
+		paint.setTextSize(TEXT_SIZE_BIG);
+		int titleWidth = (int) paint.measureText(getSontTitle(song));
+		paint.setTextSize(TEXT_SIZE);
+		int albumWidth = (int) paint.measureText(getSongAlbum(song));
+		int artistWidth = (int) paint.measureText(getSongArtist(song));
+
+		paint.setTextSize(TEXT_SIZE_BIG);
 		drawText(canvas, title, left, top, titleWidth, maxWidth, paint);
-		top += titleSize + padding;
+		top += TEXT_SIZE_BIG + PADDING;
 
-		paint.setTextSize(subSize);
+		paint.setTextSize(TEXT_SIZE);
 		drawText(canvas, album, left, top, albumWidth, maxWidth, paint);
-		top += subSize + padding;
+		top += TEXT_SIZE + PADDING;
 
 		drawText(canvas, artist, left, top, artistWidth, maxWidth, paint);
+	}
 
-		return bitmap;
+	private static Rect measureTextBox(Song song, int maximumWidth,
+			int maximumHeight, Paint paint) {
+		paint.setTextSize(TEXT_SIZE_BIG);
+		int titleWidth = (int) paint.measureText(getSontTitle(song));
+		paint.setTextSize(TEXT_SIZE);
+		int albumWidth = (int) paint.measureText(getSongAlbum(song));
+		int artistWidth = (int) paint.measureText(getSongArtist(song));
+
+		int boxWidth = Math.min(maximumWidth,
+				Math.max(titleWidth, Math.max(artistWidth, albumWidth))
+						+ PADDING * 2);
+		int boxHeight = Math.min(maximumHeight, TEXT_SIZE_BIG + TEXT_SIZE * 2
+				+ PADDING * 4);
+		Rect textBoxDimensions = new Rect(0, 0, boxWidth, boxHeight);
+		return textBoxDimensions;
+	}
+
+	private static String getSongArtist(Song song) {
+		return song.artist == null ? "" : song.artist;
+	}
+
+	private static String getSongAlbum(Song song) {
+		return song.album == null ? "" : song.album;
+	}
+
+	private static String getSontTitle(Song song) {
+		return song.title == null ? "" : song.title;
 	}
 
 	private static Bitmap createSeparatedBitmap(Context context, Bitmap cover,
@@ -275,9 +312,9 @@ public final class CoverBitmap {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 
-		String title = song.title == null ? "" : song.title;
-		String album = song.album == null ? "" : song.album;
-		String artist = song.artist == null ? "" : song.artist;
+		String title = getSontTitle(song);
+		String album = getSongAlbum(song);
+		String artist = getSongArtist(song);
 
 		int textSize = TEXT_SIZE;
 		int padding = PADDING;
