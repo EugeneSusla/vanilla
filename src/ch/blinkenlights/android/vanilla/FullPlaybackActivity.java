@@ -22,6 +22,7 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import eugene.config.Config;
 import eugene.gestures.notification.Shouter;
 import eugene.ioc.ComponentResolver;
 import android.content.Intent;
@@ -479,11 +480,23 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		mControlsBottom.setVisibility(mode);
 		mInfoTable.setVisibility(mode);
 		mControlsVisible = visible;
-
+		boolean lowProfileToggleEnabled = Config.INSTANCE
+				.isUseLowProfileInCompactMode();
 		if (visible) {
+			if (lowProfileToggleEnabled
+					|| ((getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0)) {
+				getWindow().getDecorView().setSystemUiVisibility(
+						View.SYSTEM_UI_FLAG_VISIBLE);
+			}
 			mPlayPauseButton.requestFocus();
 			updateElapsedTime();
+		} else {
+			if (lowProfileToggleEnabled) {
+				getWindow().getDecorView().setSystemUiVisibility(
+						View.SYSTEM_UI_FLAG_LOW_PROFILE);
+			}
 		}
+
 	}
 
 	/**
