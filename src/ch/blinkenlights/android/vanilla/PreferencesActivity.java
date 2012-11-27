@@ -23,10 +23,10 @@
 
 package ch.blinkenlights.android.vanilla;
 
-import android.annotation.TargetApi;
+import java.util.List;
+
 import android.app.Activity;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -37,7 +37,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewFragment;
-import java.util.List;
 
 /**
  * The preferences activity in which one can change application preferences.
@@ -46,7 +45,6 @@ public class PreferencesActivity extends PreferenceActivity {
 	/**
 	 * Initialize the activity, loading the preference specifications.
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{

@@ -451,7 +451,7 @@ public final class PlaybackService extends Service
 			} else if (ACTION_TOGGLE_PLAYBACK_NOTIFICATION.equals(action)) {
 				mForceNotificationVisible = true;
 				synchronized (mStateLock) {
-					if ((mState & FLAG_PLAYING) != 0)
+					if (isPlaying())
 						pause();
 					else
 						play();
@@ -885,7 +885,7 @@ public final class PlaybackService extends Service
 	{
 		Song song = mCurrentSong;
 		Intent intent = new Intent("com.android.music.playstatechanged");
-		intent.putExtra("playing", (mState & FLAG_PLAYING) != 0);
+		intent.putExtra("playing", isPlaying());
 		if (song != null) {
 			intent.putExtra("track", song.title);
 			intent.putExtra("album", song.album);
@@ -900,7 +900,7 @@ public final class PlaybackService extends Service
 	{
 		Song song = mCurrentSong;
 		Intent intent = new Intent("net.jjc1138.android.scrobbler.action.MUSIC_STATUS");
-		intent.putExtra("playing", (mState & FLAG_PLAYING) != 0);
+		intent.putExtra("playing", isPlaying());
 		if (song != null)
 			intent.putExtra("id", (int)song.id);
 		sendBroadcast(intent);
@@ -908,7 +908,7 @@ public final class PlaybackService extends Service
 
 	private void updateNotification()
 	{
-		if ((mForceNotificationVisible || mNotificationMode == ALWAYS || mNotificationMode == WHEN_PLAYING && (mState & FLAG_PLAYING) != 0) && mCurrentSong != null)
+		if ((mForceNotificationVisible || mNotificationMode == ALWAYS || mNotificationMode == WHEN_PLAYING && isPlaying()) && mCurrentSong != null)
 			mNotificationManager.notify(NOTIFICATION_ID, createNotification(mCurrentSong, mState));
 		else
 			mNotificationManager.cancel(NOTIFICATION_ID);
@@ -957,11 +957,15 @@ public final class PlaybackService extends Service
 	{
 		mForceNotificationVisible = false;
 		synchronized (mStateLock) {
-			if ((mState & FLAG_PLAYING) != 0)
+			if (isPlaying())
 				return pause();
 			else
 				return play();
 		}
+	}
+
+	public boolean isPlaying() {
+		return (mState & FLAG_PLAYING) != 0;
 	}
 
 
@@ -1095,7 +1099,7 @@ public final class PlaybackService extends Service
 				mPendingSeek = 0;
 			}
 
-			if ((mState & FLAG_PLAYING) != 0)
+			if (isPlaying())
 				mMediaPlayer.start();
 
 			if ((mState & FLAG_ERROR) != 0) {
@@ -1277,7 +1281,7 @@ public final class PlaybackService extends Service
 			runQuery((QueryTask)message.obj);
 			break;
 		case IDLE_TIMEOUT:
-			if ((mState & FLAG_PLAYING) != 0) {
+			if (isPlaying()) {
 				mHandler.sendMessage(mHandler.obtainMessage(FADE_OUT, 100, 0));
 				mFadeInProgress = true;
 			}
@@ -1787,7 +1791,7 @@ public final class PlaybackService extends Service
 		Log.d("VanillaMusic", "audio focus change: " + type);
 		switch (type) {
 		case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-			mDuckedLoss = (mState & FLAG_PLAYING) != 0;
+			mDuckedLoss = isPlaying();
 			unsetFlag(FLAG_PLAYING);
 			break;
 		case AudioManager.AUDIOFOCUS_LOSS:

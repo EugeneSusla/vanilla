@@ -82,9 +82,14 @@ public final class CoverView extends View implements Handler.Callback {
 		public void shiftCurrentSong(int delta);
 
 		/**
-		 * Called when the user has swiped up on the view.
+		 * Called when the user has swiped a gesture on the view.
 		 */
 		public void gesture(BasicGesture gesture);
+		
+		/**
+		 * Called when the swiped gesture is changed.
+		 */
+		public void midwayGesture(BasicGesture gesture);
 	}
 
 	/**
@@ -286,7 +291,8 @@ public final class CoverView extends View implements Handler.Callback {
 
 			if (mCurrentGesture.addStroke(StrokeUtils.getStrokeFromDeltas(
 					deltaX, deltaY))) {
-				Shouter.shout(mCurrentGesture.toString());
+//				Shouter.shout(mCurrentGesture.toString());
+				onMidwayGesture(mCurrentGesture);
 			}
 
 			// if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -406,6 +412,18 @@ public final class CoverView extends View implements Handler.Callback {
 		// return;
 		// }
 		mCallback.gesture(gesture);
+	}
+	
+	private void onMidwayGesture(BasicGesture gesture) {
+		// if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
+		// onSideSwipe(1);
+		// return;
+		// }
+		// if (gesture.equals(BasicGesture.valueOf(Stroke.RIGHT))) {
+		// onSideSwipe(-1);
+		// return;
+		// }
+		mCallback.midwayGesture(gesture);
 	}
 
 	/**
@@ -566,6 +584,17 @@ public final class CoverView extends View implements Handler.Callback {
 			// MiniPlaybackActivity: be square
 			int size = Math.min(width, height);
 			setMeasuredDimension(size, size);
+		}
+	}
+
+	public BasicGesture getCurrentGesture() {
+		return mCurrentGesture;
+	}
+
+	public void setCurrentGesture(BasicGesture newGesture) {
+		if (mCurrentGesture == null || !mCurrentGesture.equals(newGesture)) {
+			this.mCurrentGesture = newGesture;
+			onMidwayGesture(mCurrentGesture);
 		}
 	}
 }

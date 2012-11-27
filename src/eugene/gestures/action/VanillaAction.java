@@ -1,12 +1,11 @@
 package eugene.gestures.action;
 
-import ch.blinkenlights.android.vanilla.FullPlaybackActivity;
-import ch.blinkenlights.android.vanilla.PlaybackService;
+import ch.blinkenlights.android.vanilla.Action;
 import eugene.gestures.StringUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.ioc.ComponentResolver;
 
-public class VanillaAction extends ClassNameDisplayNameAction {
+public class VanillaAction implements eugene.gestures.action.Action {
 	
 	private ch.blinkenlights.android.vanilla.Action vanillaAction;
 	
@@ -17,8 +16,7 @@ public class VanillaAction extends ClassNameDisplayNameAction {
 
 	@Override
 	public ShoutNotification invoke() {
-		FullPlaybackActivity playbackActivity = ComponentResolver.getFullPlaybackActivity();
-		ComponentResolver.getPlaybackService().performAction(vanillaAction, playbackActivity);
+		ComponentResolver.getFullPlaybackActivity().performAction(vanillaAction);
 		return null;
 	}
 

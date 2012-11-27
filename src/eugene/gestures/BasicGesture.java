@@ -2,42 +2,45 @@ package eugene.gestures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eugene.gestures.notification.Shouter;
 
-public class BasicGesture {
-	public static final BasicGesture TAP = new BasicGesture(Arrays.asList(Stroke.STATIC));
-	public static final BasicGesture LONG_TAP = new BasicGesture(Arrays.asList(Stroke.STATIC, Stroke.STATIC));
-	
-	private static final int MAX_STROKES_PER_GESTURE = 6;
+public class BasicGesture implements Cloneable {
+	public static final BasicGesture TAP = new BasicGesture(
+			Collections.unmodifiableList(Arrays.asList(Stroke.STATIC)));
+	public static final BasicGesture LONG_TAP = new BasicGesture(
+			Collections.unmodifiableList(Arrays.asList(Stroke.STATIC,
+					Stroke.STATIC)));
+
 
 	private static ConcurrentHashMap<Stroke, BasicGesture> mCache = new ConcurrentHashMap<Stroke, BasicGesture>();
-	
+
 	private List<Stroke> gestureStrokes = new ArrayList<Stroke>(
-			MAX_STROKES_PER_GESTURE);
+			Collections.singletonList(Stroke.STATIC));
 
 	public BasicGesture() {
 	}
-	
+
 	public BasicGesture(List<Stroke> gestureStrokes) {
-		this.gestureStrokes = gestureStrokes;
+		this.gestureStrokes = new ArrayList<Stroke>(gestureStrokes);
 	}
-	
+
 	public boolean addStroke(Stroke stroke) {
 		if (gestureStrokes.isEmpty()
 				|| (stroke != gestureStrokes.get(gestureStrokes.size() - 1) && stroke != Stroke.STATIC)) {
-			if (gestureStrokes.size() == 1
-					&& gestureStrokes.get(0) == Stroke.STATIC) {
-				gestureStrokes.remove(0);
+			if ((gestureStrokes.size() == 1 && gestureStrokes.get(0) == Stroke.STATIC)
+					|| (gestureStrokes.size() == 2 && gestureStrokes.get(1) == Stroke.STATIC)) {
+				gestureStrokes.clear();
 			}
 			gestureStrokes.add(stroke);
 			return true;
 		}
 		return false;
 	}
-	
+
 	public static BasicGesture valueOf(Stroke... strokes) {
 		if (strokes.length > 1 || strokes.length == 0) {
 			return createNewGesture(strokes);
@@ -71,9 +74,14 @@ public class BasicGesture {
 		BasicGesture other = (BasicGesture) o;
 		return gestureStrokes.equals(other.gestureStrokes);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return gestureStrokes.hashCode();
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return new BasicGesture(gestureStrokes);
 	}
 }

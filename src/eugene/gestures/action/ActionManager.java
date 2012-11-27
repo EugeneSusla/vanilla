@@ -2,6 +2,7 @@ package eugene.gestures.action;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import eugene.gestures.action.impl.PlayPauseAction;
 import eugene.ioc.ComponentResolver;
 
 public enum ActionManager {
@@ -52,6 +53,9 @@ public enum ActionManager {
 	}
 	
 	public VanillaAction getVanillaAction(ch.blinkenlights.android.vanilla.Action vanillaAction) {
+		if (vanillaAction == ch.blinkenlights.android.vanilla.Action.PlayPause) {
+			return (VanillaAction) getActionInstance(PlayPauseAction.class);
+		}
 		return (VanillaAction) getActionBySettingsName(VANILLA_ACTION_PREFIX + vanillaAction.name());
 	}
 }

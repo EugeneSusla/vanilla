@@ -22,8 +22,14 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import java.util.Arrays;
+
 import eugene.config.Config;
+import eugene.gestures.BasicGesture;
+import eugene.gestures.Stroke;
 import eugene.gestures.notification.Shouter;
+import eugene.gestures.notification.song.CurrentSongNotification;
+import eugene.gestures.notification.view.ShoutBoxView;
 import eugene.ioc.ComponentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -59,6 +65,8 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	private TextView mOverlayText;
 	private View mControlsTop;
 	private View mControlsBottom;
+	
+	private ShoutBoxView shoutBoxView;
 
 	private SeekBar mSeekBar;
 	private TableLayout mInfoTable;
@@ -90,8 +98,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	 */
 	private int mDisplayMode;
 
-	private Action mCoverPressAction;
-	private Action mCoverLongPressAction;
+	
 
 	/**
 	 * Cached StringBuilder for formatting track position.
@@ -151,6 +158,8 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		coverView.setOnClickListener(this);
 		coverView.setOnLongClickListener(this);
 		mCoverView = coverView;
+		
+		shoutBoxView = (ShoutBoxView) findViewById(R.id.shoutbox_view);
 
 		mControlsBottom = findViewById(R.id.controls_bottom);
 		View previousButton = findViewById(R.id.previous);
@@ -196,6 +205,8 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO,
 				false));
 		setDuration(0);
+		
+		ComponentResolver.setFullPlaybackActivity(this);
 	}
 
 	public void shout(String message) {
@@ -215,10 +226,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			startActivity(new Intent(this, FullPlaybackActivity.class));
 		}
 
-		mCoverPressAction = Action.getAction(settings,
-				PrefKeys.COVER_PRESS_ACTION, Action.ToggleControls);
-		mCoverLongPressAction = Action.getAction(settings,
-				PrefKeys.COVER_LONGPRESS_ACTION, Action.PlayPause);
+		
 	}
 
 	@Override
@@ -315,8 +323,8 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		if (mExtraInfoVisible) {
 			mHandler.sendEmptyMessage(MSG_LOAD_EXTRA_INFO);
 		}
-
-		ComponentResolver.setFullPlaybackActivity(this);
+		
+		Shouter.shout(CurrentSongNotification.INSTANCE);
 	}
 
 	/**
@@ -476,10 +484,14 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	 */
 	private void setControlsVisible(boolean visible) {
 		int mode = visible ? View.VISIBLE : View.GONE;
+		int oppositeMode = (!visible) ? View.VISIBLE : View.GONE;
 		mControlsTop.setVisibility(mode);
 		mControlsBottom.setVisibility(mode);
 		if (mInfoTable != null) {
 			mInfoTable.setVisibility(mode);
+		}
+		if (shoutBoxView != null) {
+			shoutBoxView.setVisibility(oppositeMode);
 		}
 		mControlsVisible = visible;
 		boolean lowProfileToggleEnabled = Config.INSTANCE
@@ -697,7 +709,9 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			setState(PlaybackService.get(this).setFinishAction(
 					SongTimeline.FINISH_RANDOM));
 		} else if (view == getCoverView()) {
-			performAction(mCoverPressAction);
+//			performAction(mCoverPressAction);
+//			gesture(BasicGesture.TAP);
+//			mCoverView.setCurrentGesture(BasicGesture.TAP);
 		} else if (view.getId() == R.id.info_table) {
 			openLibrary(mCurrentSong);
 		} else {
@@ -709,7 +723,9 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	public boolean onLongClick(View view) {
 		switch (view.getId()) {
 		case R.id.cover_view:
-			performAction(mCoverLongPressAction);
+			mCoverView.setCurrentGesture(new BasicGesture(Arrays.asList(Stroke.STATIC, Stroke.STATIC)));
+//			super.midwayGesture();
+//			performAction(mCoverLongPressAction);
 			break;
 		case R.id.info_table:
 			setExtraInfoVisible(!mExtraInfoVisible);
@@ -720,5 +736,13 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		}
 
 		return true;
+	}
+
+	public ShoutBoxView getShoutBoxView() {
+		return shoutBoxView;
+	}
+
+	public Song getCurrentSong() {
+		return mCurrentSong;
 	}
 }

@@ -22,6 +22,7 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import eugene.config.Config;
 import eugene.gestures.BasicGesture;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.ActionManager;
@@ -30,6 +31,7 @@ import eugene.gestures.action.impl.NextTrackAction;
 import eugene.gestures.action.impl.PreviousTrackAction;
 import eugene.gestures.listener.ActionMapGestureListener;
 import eugene.gestures.listener.GestureListener;
+import eugene.gestures.notification.Shouter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,6 +62,8 @@ public abstract class PlaybackActivity extends Activity implements
 		Handler.Callback, View.OnClickListener, CoverView.Callback {
 	private Action mUpAction;
 	private Action mDownAction;
+	protected Action mCoverPressAction;
+	private Action mCoverLongPressAction;
 
 	/**
 	 * A Handler running on the UI thread, in contrast with mHandler which runs
@@ -123,12 +127,18 @@ public abstract class PlaybackActivity extends Activity implements
 				Action.Nothing);
 		mDownAction = Action.getAction(prefs, PrefKeys.SWIPE_DOWN_ACTION,
 				Action.Nothing);
+		mCoverPressAction = Action.getAction(prefs,
+				PrefKeys.COVER_PRESS_ACTION, Action.ToggleControls);
+		mCoverLongPressAction = Action.getAction(prefs,
+				PrefKeys.COVER_LONGPRESS_ACTION, Action.PlayPause);
 		
-		ActionMapGestureListener gestureListener = new ActionMapGestureListener();
+		GestureListener gestureListener = new ActionMapGestureListener();
 		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.UP), ActionManager.INSTANCE.getVanillaAction(mUpAction));
 		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.DOWN), ActionManager.INSTANCE.getVanillaAction(mDownAction));
 		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.LEFT), ActionManager.INSTANCE.getActionInstance(NextTrackAction.class));
 		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.RIGHT), ActionManager.INSTANCE.getActionInstance(PreviousTrackAction.class));
+		gestureListener.registerActionOnGesture(BasicGesture.TAP, ActionManager.INSTANCE.getVanillaAction(mCoverPressAction));
+		gestureListener.registerActionOnGesture(BasicGesture.LONG_TAP, ActionManager.INSTANCE.getVanillaAction(mCoverLongPressAction));
 		mGestureListener = gestureListener;
 
 		Window window = getWindow();
@@ -395,7 +405,15 @@ public abstract class PlaybackActivity extends Activity implements
 //		} else if (gesture.equals(BasicGesture.valueOf(Stroke.DOWN))) {
 //			downSwipe();
 //		}
-		mGestureListener.onGesture(gesture);
+		boolean gestureRecognized = mGestureListener.onGesture(gesture);
+		if (!gestureRecognized) {
+			Shouter.shout("Unknown gesture: " + gesture);
+		}
+	}
+	
+	@Override
+	public void midwayGesture(BasicGesture gesture) {
+		mGestureListener.onMidwayGesture(gesture);
 	}
 	
 //	public void upSwipe() {
