@@ -1,4 +1,4 @@
-package eugene.gestures;
+package eugene.utils;
 
 public class StringUtils {
 	private StringUtils() {

@@ -1,9 +1,9 @@
 package eugene.gestures.action;
 
 import ch.blinkenlights.android.vanilla.Action;
-import eugene.gestures.StringUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.ioc.ComponentResolver;
+import eugene.utils.StringUtils;
 
 public class VanillaAction implements eugene.gestures.action.Action {
 	

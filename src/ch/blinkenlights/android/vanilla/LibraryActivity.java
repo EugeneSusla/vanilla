@@ -44,6 +44,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,6 +62,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.viewpagerindicator.TabPageIndicator;
+
+import eugene.config.Config;
+
 import java.io.File;
 import junit.framework.Assert;
 
@@ -460,6 +464,10 @@ public class LibraryActivity
 		if (action == ACTION_LAST_USED)
 			action = mLastAction;
 
+		if (action != ACTION_DO_NOTHING && Config.INSTANCE.isLibraryGoToPlaybackOnFolderAction()) {
+			openPlaybackActivity();
+		}
+		
 		if (action == ACTION_EXPAND && rowData.getBooleanExtra(LibraryAdapter.DATA_EXPANDABLE, false)) {
 			onItemExpanded(rowData);
 		} else if (rowData.getLongExtra(LibraryAdapter.DATA_ID, LibraryAdapter.INVALID_ID) == mLastActedId) {
@@ -519,7 +527,8 @@ public class LibraryActivity
 
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			params.leftMargin = 5;
-			for (int i = 0; i != limiter.length; ++i) {
+			for (int i = limiter.length - 1; i >= 0; i--) {
+//			for (int i = 0; i != limiter.length; ++i) {
 				PaintDrawable background = new PaintDrawable(Color.GRAY);
 				background.setCornerRadius(5);
 
@@ -535,7 +544,7 @@ public class LibraryActivity
 				view.setOnClickListener(this);
 				mLimiterViews.addView(view);
 			}
-
+			
 			mLimiterScroller.setVisibility(View.VISIBLE);
 		} else {
 			mLimiterScroller.setVisibility(View.GONE);

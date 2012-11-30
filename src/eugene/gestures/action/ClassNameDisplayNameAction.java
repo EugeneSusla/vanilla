@@ -1,6 +1,6 @@
 package eugene.gestures.action;
 
-import eugene.gestures.StringUtils;
+import eugene.utils.StringUtils;
 
 public abstract class ClassNameDisplayNameAction implements Action {
 

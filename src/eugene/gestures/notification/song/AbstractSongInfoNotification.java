@@ -14,7 +14,9 @@ public abstract class AbstractSongInfoNotification extends DrawableNotification 
 
 	@Override
 	public String asText() {
-		return getSong().title + SEPARATOR + getSong().artist + SEPARATOR + getSong().album;
+//		return getSong().title + SEPARATOR + getSong().artist + SEPARATOR
+//				+ getSong().album;
+		return getSong().path;
 	}
 
 	@Override
@@ -23,5 +25,4 @@ public abstract class AbstractSongInfoNotification extends DrawableNotification 
 				canvas.getHeight(), ComponentResolver.getCoverView()
 						.getContext());
 	}
-
 }

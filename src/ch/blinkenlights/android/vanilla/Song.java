@@ -22,6 +22,9 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import java.io.FileDescriptor;
+import java.io.UnsupportedEncodingException;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -31,7 +34,7 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.LruCache;
-import java.io.FileDescriptor;
+import eugene.config.Config;
 
 /**
  * Represents a Song backed by the MediaStore. Includes basic metadata and
@@ -52,37 +55,29 @@ public class Song implements Comparable<Song> {
 	 */
 	public static final int FLAG_COUNT = 2;
 
-	public static final String[] EMPTY_PROJECTION = {
-		MediaStore.Audio.Media._ID,
-	};
+	public static final String[] EMPTY_PROJECTION = { MediaStore.Audio.Media._ID, };
 
 	public static final String[] FILLED_PROJECTION = {
-		MediaStore.Audio.Media._ID,
-		MediaStore.Audio.Media.DATA,
-		MediaStore.Audio.Media.TITLE,
-		MediaStore.Audio.Media.ALBUM,
-		MediaStore.Audio.Media.ARTIST,
-		MediaStore.Audio.Media.ALBUM_ID,
-		MediaStore.Audio.Media.ARTIST_ID,
-		MediaStore.Audio.Media.DURATION,
-		MediaStore.Audio.Media.TRACK,
+			MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DATA,
+			MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ALBUM,
+			MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM_ID,
+			MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.DURATION,
+			MediaStore.Audio.Media.TRACK,
+	// MediaStore.Audio.Media.DISPLAY_NAME,
 	};
 
-	public static final String[] EMPTY_PLAYLIST_PROJECTION = {
-		MediaStore.Audio.Playlists.Members.AUDIO_ID,
-	};
+	public static final String[] EMPTY_PLAYLIST_PROJECTION = { MediaStore.Audio.Playlists.Members.AUDIO_ID, };
 
 	public static final String[] FILLED_PLAYLIST_PROJECTION = {
-		MediaStore.Audio.Playlists.Members.AUDIO_ID,
-		MediaStore.Audio.Playlists.Members.DATA,
-		MediaStore.Audio.Playlists.Members.TITLE,
-		MediaStore.Audio.Playlists.Members.ALBUM,
-		MediaStore.Audio.Playlists.Members.ARTIST,
-		MediaStore.Audio.Playlists.Members.ALBUM_ID,
-		MediaStore.Audio.Playlists.Members.ARTIST_ID,
-		MediaStore.Audio.Playlists.Members.DURATION,
-		MediaStore.Audio.Playlists.Members.TRACK,
-	};
+			MediaStore.Audio.Playlists.Members.AUDIO_ID,
+			MediaStore.Audio.Playlists.Members.DATA,
+			MediaStore.Audio.Playlists.Members.TITLE,
+			MediaStore.Audio.Playlists.Members.ALBUM,
+			MediaStore.Audio.Playlists.Members.ARTIST,
+			MediaStore.Audio.Playlists.Members.ALBUM_ID,
+			MediaStore.Audio.Playlists.Members.ARTIST_ID,
+			MediaStore.Audio.Playlists.Members.DURATION,
+			MediaStore.Audio.Playlists.Members.TRACK, };
 
 	/**
 	 * A cache of 6 MiB of covers.
@@ -90,23 +85,25 @@ public class Song implements Comparable<Song> {
 	private static class CoverCache extends LruCache<Long, Bitmap> {
 		private final Context mContext;
 
-		public CoverCache(Context context)
-		{
+		public CoverCache(Context context) {
 			super(6 * 1024 * 1024);
 			mContext = context;
 		}
 
 		@Override
-		public Bitmap create(Long key)
-		{
-			Uri uri =  Uri.parse("content://media/external/audio/media/" + key + "/albumart");
+		public Bitmap create(Long key) {
+			Uri uri = Uri.parse("content://media/external/audio/media/" + key
+					+ "/albumart");
 			ContentResolver res = mContext.getContentResolver();
 
 			try {
-				ParcelFileDescriptor parcelFileDescriptor = res.openFileDescriptor(uri, "r");
+				ParcelFileDescriptor parcelFileDescriptor = res
+						.openFileDescriptor(uri, "r");
 				if (parcelFileDescriptor != null) {
-					FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-					return BitmapFactory.decodeFileDescriptor(fileDescriptor, null, BITMAP_OPTIONS);
+					FileDescriptor fileDescriptor = parcelFileDescriptor
+							.getFileDescriptor();
+					return BitmapFactory.decodeFileDescriptor(fileDescriptor,
+							null, BITMAP_OPTIONS);
 				}
 			} catch (Exception e) {
 				// no cover art found
@@ -116,8 +113,7 @@ public class Song implements Comparable<Song> {
 		}
 
 		@Override
-		protected int sizeOf(Long key, Bitmap value)
-		{
+		protected int sizeOf(Long key, Bitmap value) {
 			return value.getRowBytes() * value.getHeight();
 		}
 	}
@@ -181,8 +177,7 @@ public class Song implements Comparable<Song> {
 	 * Initialize the song with the specified id. Call populate to fill fields
 	 * in the song.
 	 */
-	public Song(long id)
-	{
+	public Song(long id) {
 		this.id = id;
 	}
 
@@ -190,8 +185,7 @@ public class Song implements Comparable<Song> {
 	 * Initialize the song with the specified id and flags. Call populate to
 	 * fill fields in the song.
 	 */
-	public Song(long id, int flags)
-	{
+	public Song(long id, int flags) {
 		this.id = id;
 		this.flags = flags;
 	}
@@ -199,37 +193,94 @@ public class Song implements Comparable<Song> {
 	/**
 	 * Return true if this song was retrieved from randomSong().
 	 */
-	public boolean isRandom()
-	{
+	public boolean isRandom() {
 		return (flags & FLAG_RANDOM) != 0;
 	}
 
 	/**
 	 * Populate fields with data from the supplied cursor.
-	 *
-	 * @param cursor Cursor queried with FILLED_PROJECTION projection
+	 * 
+	 * @param cursor
+	 *            Cursor queried with FILLED_PROJECTION projection
 	 */
-	public void populate(Cursor cursor)
-	{
+	public void populate(Cursor cursor) {
 		id = cursor.getLong(0);
 		path = cursor.getString(1);
-		title = cursor.getString(2);
-		album = cursor.getString(3);
-		artist = cursor.getString(4);
+		if (Config.INSTANCE.isPerformCharsetConversion()) {
+			title = decode(cursor.getString(2));
+			album = decode(cursor.getString(3));
+			artist = decode(cursor.getString(4));
+		} else {
+			title = cursor.getString(2);
+			album = cursor.getString(3);
+			artist = cursor.getString(4);
+		}
 		albumId = cursor.getLong(5);
 		artistId = cursor.getLong(6);
 		duration = cursor.getLong(7);
 		trackNumber = cursor.getInt(8);
 	}
 
+	private String decode(String input) {
+		int inputLength = input.length();
+
+		// Quick-detect a unicode string being passed by looking at middle
+		// character
+		if (inputLength == 0
+				|| (((int) input.charAt(inputLength / 2)) | 0xff) != 0xff) {
+			return input;
+		}
+
+		boolean smartDetectAdditionalLatin = Config.INSTANCE
+				.isSmartDetectAdditionalLatin();
+		int latinCount = 0;
+		int nonAsciiCount = 0;
+
+		char[] inputChars = new char[inputLength];
+		input.getChars(0, inputLength, inputChars, 0);
+		byte[] newBytes = new byte[inputLength];
+		for (int i = 0; i < inputLength; ++i) {
+
+			int charNumericValue = (int) inputChars[i];
+
+			// verify it's not a two-byte character
+			if ((charNumericValue | 0xff) != 0xff) {
+				// the string is not in 1-byte encoding - abort decoding
+				return input;
+			}
+
+			// contribute to latin vs non-ascii statistics
+			if (smartDetectAdditionalLatin) {
+				if ((65 <= charNumericValue && charNumericValue <= 90)
+						|| (97 <= charNumericValue && charNumericValue <= 122)) {
+					++latinCount;
+				} else if ((charNumericValue & 0x80) == 0x80) {
+					++nonAsciiCount;
+				}
+			}
+
+			newBytes[i] = (byte) charNumericValue;
+		}
+		try {
+			if (!smartDetectAdditionalLatin || nonAsciiCount > latinCount) {
+				return new String(newBytes, Config.INSTANCE.getDefaultCharset());
+			} else {
+				// Latin characters dominate - treat remaining as iso-8859-1 chars - no need to convert
+				return input;
+			}
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Get the id of the given song.
-	 *
-	 * @param song The Song to get the id from.
+	 * 
+	 * @param song
+	 *            The Song to get the id from.
 	 * @return The id, or 0 if the given song is null.
 	 */
-	public static long getId(Song song)
-	{
+	public static long getId(Song song) {
 		if (song == null)
 			return 0;
 		return song.id;
@@ -244,12 +295,12 @@ public class Song implements Comparable<Song> {
 
 	/**
 	 * Query the album art for this song.
-	 *
-	 * @param context A context to use.
+	 * 
+	 * @param context
+	 *            A context to use.
 	 * @return The album art or null if no album art could be found
 	 */
-	public Bitmap getCover(Context context)
-	{
+	public Bitmap getCover(Context context) {
 		if (mDisableCoverArt || id == -1 || (flags & FLAG_NO_COVER) != 0)
 			return null;
 
@@ -263,8 +314,7 @@ public class Song implements Comparable<Song> {
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return String.format("%d %d %s", id, albumId, path);
 	}
 
@@ -272,8 +322,7 @@ public class Song implements Comparable<Song> {
 	 * Compares the album ids of the two songs; if equal, compares track order.
 	 */
 	@Override
-	public int compareTo(Song other)
-	{
+	public int compareTo(Song other) {
 		if (albumId == other.albumId)
 			return trackNumber - other.trackNumber;
 		if (albumId > other.albumId)

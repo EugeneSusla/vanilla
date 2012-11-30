@@ -24,6 +24,7 @@ package ch.blinkenlights.android.vanilla;
 
 import eugene.config.Config;
 import eugene.gestures.BasicGesture;
+import eugene.gestures.GestureMappingUtils;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.ActionManager;
 import eugene.gestures.action.VanillaAction;
@@ -60,11 +61,6 @@ import android.widget.Toast;
  */
 public abstract class PlaybackActivity extends Activity implements
 		Handler.Callback, View.OnClickListener, CoverView.Callback {
-	private Action mUpAction;
-	private Action mDownAction;
-	protected Action mCoverPressAction;
-	private Action mCoverLongPressAction;
-
 	/**
 	 * A Handler running on the UI thread, in contrast with mHandler which runs
 	 * on a worker thread.
@@ -122,31 +118,17 @@ public abstract class PlaybackActivity extends Activity implements
 		else
 			startService(new Intent(this, PlaybackService.class));
 
-		SharedPreferences prefs = PlaybackService.getSettings(this);
-		mUpAction = Action.getAction(prefs, PrefKeys.SWIPE_UP_ACTION,
-				Action.Nothing);
-		mDownAction = Action.getAction(prefs, PrefKeys.SWIPE_DOWN_ACTION,
-				Action.Nothing);
-		mCoverPressAction = Action.getAction(prefs,
-				PrefKeys.COVER_PRESS_ACTION, Action.ToggleControls);
-		mCoverLongPressAction = Action.getAction(prefs,
-				PrefKeys.COVER_LONGPRESS_ACTION, Action.PlayPause);
-		
-		GestureListener gestureListener = new ActionMapGestureListener();
-		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.UP), ActionManager.INSTANCE.getVanillaAction(mUpAction));
-		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.DOWN), ActionManager.INSTANCE.getVanillaAction(mDownAction));
-		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.LEFT), ActionManager.INSTANCE.getActionInstance(NextTrackAction.class));
-		gestureListener.registerActionOnGesture(BasicGesture.valueOf(Stroke.RIGHT), ActionManager.INSTANCE.getActionInstance(PreviousTrackAction.class));
-		gestureListener.registerActionOnGesture(BasicGesture.TAP, ActionManager.INSTANCE.getVanillaAction(mCoverPressAction));
-		gestureListener.registerActionOnGesture(BasicGesture.LONG_TAP, ActionManager.INSTANCE.getVanillaAction(mCoverLongPressAction));
-		mGestureListener = gestureListener;
+		mGestureListener = GestureMappingUtils.getGestureListener();
 
+		SharedPreferences prefs = PlaybackService.getSettings(this);
 		Window window = getWindow();
 		if (prefs.getBoolean(PrefKeys.DISABLE_LOCKSCREEN, false))
 			window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 		else
 			window.clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 	}
+
+	
 
 	@Override
 	public void onResume() {

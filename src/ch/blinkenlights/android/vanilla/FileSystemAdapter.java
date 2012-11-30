@@ -41,6 +41,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
+import eugene.config.Config;
+
 /**
  * A list adapter that provides a view of the filesystem. The active directory
  * is set through a {@link Limiter} and rows are displayed using MediaViews.
@@ -318,10 +320,19 @@ public class FileSystemAdapter
 	public void onClick(View view)
 	{
 		Intent intent = createData((View)view.getParent());
-		if (view.getId() == R.id.arrow) {
+		boolean isDirectory = getFile(intent).isDirectory();
+		
+		if (isDirectory && (view.getId() == R.id.arrow ^ Config.INSTANCE.isLibrarySwapArrowAndMainBodyAction())) {
 			mActivity.onItemExpanded(intent);
 		} else {
+			if (isDirectory && Config.INSTANCE.isLibraryExpandFolderActionOn()) {
+				mActivity.onItemExpanded(intent);
+			}
 			mActivity.onItemClicked(intent);
 		}
+	}
+
+	public File getFile(Intent intent) {
+		return mFiles[(int) intent.getLongExtra("id", LibraryAdapter.INVALID_ID)];
 	}
 }

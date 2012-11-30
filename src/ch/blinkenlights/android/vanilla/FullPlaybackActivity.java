@@ -38,6 +38,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -226,7 +227,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			startActivity(new Intent(this, FullPlaybackActivity.class));
 		}
 
-		
+//		Shouter.shout(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString());
 	}
 
 	@Override
@@ -234,6 +235,14 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		super.onResume();
 		mPaused = false;
 		updateElapsedTime();
+	}
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			updateLowProfileDim();
+		}
 	}
 
 	@Override
@@ -494,23 +503,30 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			shoutBoxView.setVisibility(oppositeMode);
 		}
 		mControlsVisible = visible;
+		
+		if (visible) {
+			mPlayPauseButton.requestFocus();
+			updateElapsedTime();
+		}
+		
+		updateLowProfileDim();
+	}
+
+	private void updateLowProfileDim() {
 		boolean lowProfileToggleEnabled = Config.INSTANCE
 				.isUseLowProfileInCompactMode();
-		if (visible) {
+		if (mControlsVisible) {
 			if (lowProfileToggleEnabled
 					|| ((getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0)) {
 				getWindow().getDecorView().setSystemUiVisibility(
 						View.SYSTEM_UI_FLAG_VISIBLE);
 			}
-			mPlayPauseButton.requestFocus();
-			updateElapsedTime();
 		} else {
 			if (lowProfileToggleEnabled) {
 				getWindow().getDecorView().setSystemUiVisibility(
 						View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			}
 		}
-
 	}
 
 	/**
@@ -709,9 +725,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			setState(PlaybackService.get(this).setFinishAction(
 					SongTimeline.FINISH_RANDOM));
 		} else if (view == getCoverView()) {
-//			performAction(mCoverPressAction);
-//			gesture(BasicGesture.TAP);
-//			mCoverView.setCurrentGesture(BasicGesture.TAP);
+			// tap action handled by gesture mechanism
 		} else if (view.getId() == R.id.info_table) {
 			openLibrary(mCurrentSong);
 		} else {
@@ -723,9 +737,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	public boolean onLongClick(View view) {
 		switch (view.getId()) {
 		case R.id.cover_view:
-			mCoverView.setCurrentGesture(new BasicGesture(Arrays.asList(Stroke.STATIC, Stroke.STATIC)));
-//			super.midwayGesture();
-//			performAction(mCoverLongPressAction);
+			mCoverView.setCurrentGesture(BasicGesture.LONG_TAP);
 			break;
 		case R.id.info_table:
 			setExtraInfoVisible(!mExtraInfoVisible);

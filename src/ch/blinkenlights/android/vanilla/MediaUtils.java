@@ -521,8 +521,7 @@ public class MediaUtils {
 	{
 		// It would be better to use selectionArgs to pass path here, but there
 		// doesn't appear to be any way to pass the * when using it.
-		StringBuilder selection = new StringBuilder();
-		selection.append("_data GLOB ");
+		StringBuilder selection = new StringBuilder("_data GLOB ");
 		DatabaseUtils.appendEscapedSQLString(selection, path);
 		 // delete the quotation mark added by the escape method
 		selection.deleteCharAt(selection.length() - 1);
