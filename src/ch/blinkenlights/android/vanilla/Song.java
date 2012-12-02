@@ -35,6 +35,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.LruCache;
 import eugene.config.Config;
+import eugene.utils.StringUtils;
 
 /**
  * Represents a Song backed by the MediaStore. Includes basic metadata and
@@ -207,9 +208,9 @@ public class Song implements Comparable<Song> {
 		id = cursor.getLong(0);
 		path = cursor.getString(1);
 		if (Config.INSTANCE.isPerformCharsetConversion()) {
-			title = decode(cursor.getString(2));
-			album = decode(cursor.getString(3));
-			artist = decode(cursor.getString(4));
+			title = StringUtils.decode(cursor.getString(2));
+			album = StringUtils.decode(cursor.getString(3));
+			artist = StringUtils.decode(cursor.getString(4));
 		} else {
 			title = cursor.getString(2);
 			album = cursor.getString(3);
@@ -221,57 +222,7 @@ public class Song implements Comparable<Song> {
 		trackNumber = cursor.getInt(8);
 	}
 
-	private String decode(String input) {
-		int inputLength = input.length();
-
-		// Quick-detect a unicode string being passed by looking at middle
-		// character
-		if (inputLength == 0
-				|| (((int) input.charAt(inputLength / 2)) | 0xff) != 0xff) {
-			return input;
-		}
-
-		boolean smartDetectAdditionalLatin = Config.INSTANCE
-				.isSmartDetectAdditionalLatin();
-		int latinCount = 0;
-		int nonAsciiCount = 0;
-
-		char[] inputChars = new char[inputLength];
-		input.getChars(0, inputLength, inputChars, 0);
-		byte[] newBytes = new byte[inputLength];
-		for (int i = 0; i < inputLength; ++i) {
-
-			int charNumericValue = (int) inputChars[i];
-
-			// verify it's not a two-byte character
-			if ((charNumericValue | 0xff) != 0xff) {
-				// the string is not in 1-byte encoding - abort decoding
-				return input;
-			}
-
-			// contribute to latin vs non-ascii statistics
-			if (smartDetectAdditionalLatin) {
-				if ((65 <= charNumericValue && charNumericValue <= 90)
-						|| (97 <= charNumericValue && charNumericValue <= 122)) {
-					++latinCount;
-				} else if ((charNumericValue & 0x80) == 0x80) {
-					++nonAsciiCount;
-				}
-			}
-
-			newBytes[i] = (byte) charNumericValue;
-		}
-		try {
-			if (!smartDetectAdditionalLatin || nonAsciiCount > latinCount) {
-				return new String(newBytes, Config.INSTANCE.getDefaultCharset());
-			} else {
-				// Latin characters dominate - treat remaining as iso-8859-1 chars - no need to convert
-				return input;
-			}
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	
 
 	/**
 	 * Get the id of the given song.
