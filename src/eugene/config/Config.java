@@ -1,19 +1,26 @@
 package eugene.config;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import android.database.DatabaseUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.ShoutNotificationImpl;
 import eugene.utils.EncodingUtils;
+import eugene.utils.FolderFilteringUtils;
 
 //TODO merge somehow with android settings mechanism
 public enum Config {
 	INSTANCE;
-	
+
 	private int gestureStrokeMinPixelThreshold = 10;
-	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl("Unrecognized Gesture");
+	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl(
+			"Unrecognized Gesture");
 	/**
-	 * Dim screen in compact mode. Includes software buttons and navigation panel.
+	 * Dim screen in compact mode. Includes software buttons and navigation
+	 * panel.
 	 */
 	private boolean useLowProfileInCompactMode = true;
 	private boolean shoutBoxDrawSongInfoWhenIdle = true;
@@ -21,22 +28,32 @@ public enum Config {
 	 * 0 to 1 (percentage of total height)
 	 */
 	private float shoutBoxHeight = 0.25f;
-	
+
 	private boolean treatAlbumAsPartOfSongInfo = false;
-	
-	private float defaultCoverLeftOffset = 36f/400f;
-	
+
+	private float defaultCoverLeftOffset = 36f / 400f;
+
 	private boolean librarySwapArrowAndMainBodyAction = true;
 	private boolean libraryGoToPlaybackOnFolderAction = true;
 	private boolean libraryExpandFolderActionOn = true;
-	
+
 	private String defaultCharset = Charset.forName("windows-1251").name();
-//	private String defaultCharset = Charset.forName("iso-8859-1").name();
-	private boolean performCharsetConversion = EncodingUtils.shouldConvertFromEncoding(defaultCharset);
+	private transient boolean performCharsetConversion = EncodingUtils
+			.shouldConvertFromEncoding(defaultCharset);
 	private boolean smartDetectAdditionalLatin = true;
 
-	/*-------------------------------------------------------------------*/
+	private List<String> includeFolders = new ArrayList<String>(Arrays.asList(
+			"/storage/sdcard0/_Autosync/Audio", "/storage/sdcard0/Music"));
+	private List<String> excludeFolders = new ArrayList<String>(
+			Arrays.asList("/storage/sdcard0/Music/_Books"));
+	private transient String folderFilterSQLPart = null;
 	
+	private int folderLimiterViewVerticalPadding = 17;	//default = 2
+	private int folderLimiterViewHorizontalPadding = 8;	//default = 5
+	private boolean folderLimiterDisplayX = false;
+
+	/*-------------------------------------------------------------------*/
+
 	public int getGestureStrokeMinPixelThreshold() {
 		return gestureStrokeMinPixelThreshold;
 	}
@@ -75,7 +92,8 @@ public enum Config {
 		return shoutBoxDrawSongInfoWhenIdle;
 	}
 
-	public void setShoutBoxDrawSongInfoWhenIdle(boolean shoutBoxDrawSongInfoWhenIdle) {
+	public void setShoutBoxDrawSongInfoWhenIdle(
+			boolean shoutBoxDrawSongInfoWhenIdle) {
 		this.shoutBoxDrawSongInfoWhenIdle = shoutBoxDrawSongInfoWhenIdle;
 	}
 
@@ -117,7 +135,8 @@ public enum Config {
 		return libraryExpandFolderActionOn;
 	}
 
-	public void setLibraryExpandFolderActionOn(boolean libraryExpandFolderActionOn) {
+	public void setLibraryExpandFolderActionOn(
+			boolean libraryExpandFolderActionOn) {
 		this.libraryExpandFolderActionOn = libraryExpandFolderActionOn;
 	}
 
@@ -127,15 +146,12 @@ public enum Config {
 
 	public void setDefaultCharset(String defaultCharset) {
 		this.defaultCharset = defaultCharset;
-		performCharsetConversion = EncodingUtils.shouldConvertFromEncoding(defaultCharset);
+		performCharsetConversion = EncodingUtils
+				.shouldConvertFromEncoding(defaultCharset);
 	}
 
 	public boolean isPerformCharsetConversion() {
 		return performCharsetConversion;
-	}
-
-	public void setPerformCharsetConversion(boolean performCharsetConvertion) {
-		this.performCharsetConversion = performCharsetConvertion;
 	}
 
 	public boolean isSmartDetectAdditionalLatin() {
@@ -146,5 +162,54 @@ public enum Config {
 		this.smartDetectAdditionalLatin = smartDetectAdditionalLatin;
 	}
 
+	public List<String> getIncludeFolders() {
+		return includeFolders;
+	}
 
+	public void setIncludeFolders(List<String> includeFolders) {
+		this.includeFolders = includeFolders;
+		folderFilterSQLPart = null;
+	}
+
+	public List<String> getExcludeFolders() {
+		return excludeFolders;
+	}
+
+	public void setExcludeFolders(List<String> excludeFolders) {
+		this.excludeFolders = excludeFolders;
+		folderFilterSQLPart = null;
+	}
+
+	public String getFolderFilterSQLPart() {
+		if (folderFilterSQLPart == null) {
+			folderFilterSQLPart = FolderFilteringUtils.getFolderFilterSQLPart();
+		}
+		return folderFilterSQLPart;
+	}
+
+	public int getFolderLimiterViewVerticalPadding() {
+		return folderLimiterViewVerticalPadding;
+	}
+
+	public void setFolderLimiterViewVerticalPadding(
+			int folderLimiterViewVerticalPadding) {
+		this.folderLimiterViewVerticalPadding = folderLimiterViewVerticalPadding;
+	}
+
+	public boolean isFolderLimiterDisplayX() {
+		return folderLimiterDisplayX;
+	}
+
+	public void setFolderLimiterDisplayX(boolean folderLimiterDisplayX) {
+		this.folderLimiterDisplayX = folderLimiterDisplayX;
+	}
+
+	public int getFolderLimiterViewHorizontalPadding() {
+		return folderLimiterViewHorizontalPadding;
+	}
+
+	public void setFolderLimiterViewHorizontalPadding(
+			int folderLimiterViewHorizontalPadding) {
+		this.folderLimiterViewHorizontalPadding = folderLimiterViewHorizontalPadding;
+	}
 }

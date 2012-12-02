@@ -22,18 +22,19 @@
 
 package ch.blinkenlights.android.vanilla;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
 import junit.framework.Assert;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.net.Uri;
+import android.provider.MediaStore;
+import eugene.config.Config;
 
 /**
  * Provides some static Song/MediaStore-related utility functions.
@@ -151,6 +152,7 @@ public class MediaUtils {
 			selection.append(select);
 		}
 
+		appendFolderFilter(selection);
 		QueryTask result = new QueryTask(media, projection, selection.toString(), null, DEFAULT_SORT);
 		result.type = type;
 		return result;
@@ -169,6 +171,7 @@ public class MediaUtils {
 	{
 		Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
 		String sort = MediaStore.Audio.Playlists.Members.PLAY_ORDER;
+		appendFolderFilter(selection);
 		QueryTask result = new QueryTask(uri, projection, selection, null, sort);
 		result.type = TYPE_PLAYLIST;
 		return result;
@@ -187,6 +190,7 @@ public class MediaUtils {
 	public static QueryTask buildGenreQuery(long id, String[] projection, String selection, String[] selectionArgs, String sort)
 	{
 		Uri uri = MediaStore.Audio.Genres.Members.getContentUri("external", id);
+		appendFolderFilter(selection);
 		QueryTask result = new QueryTask(uri, projection, selection, selectionArgs, sort);
 		result.type = TYPE_GENRE;
 		return result;
@@ -366,6 +370,7 @@ public class MediaUtils {
 		if (sSongCount == -1) {
 			Uri media = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 			String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+			appendFolderFilter(selection);
 			Cursor cursor = resolver.query(media, new String[]{"count(_id)"}, selection, null, null);
 			if (cursor == null) {
 				sSongCount = 0;
@@ -392,6 +397,7 @@ public class MediaUtils {
 
 		Uri media = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 		String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+		appendFolderFilter(selection);
 		Cursor cursor = resolver.query(media, Song.EMPTY_PROJECTION, selection, null, null);
 		if (cursor == null || cursor.getCount() == 0) {
 			sSongCount = 0;
@@ -457,6 +463,7 @@ public class MediaUtils {
 			}
 
 			selection.append(')');
+			appendFolderFilter(selection);
 
 			Cursor cursor = resolver.query(media, Song.FILLED_PROJECTION, selection.toString(), null, null);
 
@@ -526,10 +533,25 @@ public class MediaUtils {
 		 // delete the quotation mark added by the escape method
 		selection.deleteCharAt(selection.length() - 1);
 		selection.append("*' AND is_music!=0");
+		appendFolderFilter(selection);
 
 		Uri media = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 		QueryTask result = new QueryTask(media, projection, selection.toString(), null, DEFAULT_SORT);
 		result.type = TYPE_FILE;
 		return result;
+	}
+	
+	private static String appendFolderFilter(String selection) {
+		StringBuilder result = new StringBuilder(selection);
+		appendFolderFilter(result);
+		return result.toString();
+	}
+	
+	private static void appendFolderFilter(StringBuilder selection) {
+		String folderFilterSQLPart = Config.INSTANCE.getFolderFilterSQLPart();
+		if (selection.length() > 0) {
+			selection.append(" AND ");
+		}
+		selection.append(folderFilterSQLPart);
 	}
 }
