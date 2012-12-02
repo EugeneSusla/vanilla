@@ -4,9 +4,11 @@
   <string name="app_name">Vanilla Music</string>
   <string name="settings">Параметри</string>
   <string name="library">Бібліотека</string>
+  <string name="shuffle">Випадковий порядок</string>
   <string name="no_shuffle">Ні відтворювати у випадковому порядку</string>
-  <string name="shuffle_songs">випадкові пісні</string>
-  <string name="shuffle_albums">випадкові альбоми</string>
+  <string name="shuffle_songs">Випадкові пісні</string>
+  <string name="shuffle_albums">Випадкові альбоми</string>
+  <string name="end_action">Дія в кінці</string>
   <string name="no_repeat">Не повторювати</string>
   <string name="repeat">Повторити</string>
   <string name="random">Випадково</string>

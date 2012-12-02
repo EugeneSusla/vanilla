@@ -413,6 +413,7 @@ public abstract class PlaybackActivity extends Activity implements
 	public void onCreateContextMenu(ContextMenu menu, View view,
 			ContextMenu.ContextMenuInfo menuInfo) {
 		if (view == mShuffleButton) {
+			menu.setHeaderTitle(R.string.shuffle);
 			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_NONE, 0,
 					R.string.no_shuffle);
 			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_SONGS, 0,
@@ -420,6 +421,7 @@ public abstract class PlaybackActivity extends Activity implements
 			menu.add(GROUP_SHUFFLE, SongTimeline.SHUFFLE_ALBUMS, 0,
 					R.string.shuffle_albums);
 		} else if (view == mEndButton) {
+			menu.setHeaderTitle(R.string.end_action);
 			menu.add(GROUP_FINISH, SongTimeline.FINISH_STOP, 0,
 					R.string.no_repeat);
 			menu.add(GROUP_FINISH, SongTimeline.FINISH_REPEAT, 0,

@@ -6,9 +6,11 @@
   <string name="empty_queue">Песни не выбраны. Выбрать некоторые из библиотеки или выбрать случайный режим, коснувшись этого сообщения.</string>
   <string name="settings">Настройки</string>
   <string name="library">Библиотека</string>
+  <string name="shuffle">Порядок воспроизведения</string>
   <string name="no_shuffle">Нет перетасовать</string>
   <string name="shuffle_songs">Перемешать песни</string>
   <string name="shuffle_albums">Перемешать альбомы</string>
+  <string name="end_action">Действие в конце</string>
   <string name="no_repeat">Не повторять</string>
   <string name="repeat">Повторить</string>
   <string name="repeat_current_song">Повтор текущих песен</string>
