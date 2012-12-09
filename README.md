@@ -1,7 +1,10 @@
-Translating
+Vanilla Player with Gestures
 ===========
-[You can help translate here][1]. If your language isn't on the list, open an
-issue and I can add it.
+This is my mod of Vanilla, the open source music player for android.
+It embraces minimalistic, no-controls design with gesture manipulation.
+Also features non-ISO-8859-1 1-byte encodings support and a few useful tweaks/bugfixes.
+
+The rest of this README.md file is from the original vanilla player readme
 
 Building
 ========
