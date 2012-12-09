@@ -484,6 +484,7 @@ public final class SongTimeline {
 	 *
 	 * @param delta The offset from the current position. Must be -1, 0, or 1.
 	 */
+	//FIXME: Ignores current shuffle mode
 	public Song getSong(int delta)
 	{
 		Assert.assertTrue(delta >= -1 && delta <= 1);
@@ -521,10 +522,6 @@ public final class SongTimeline {
 			}
 		}
 
-		if (song == null)
-			// we have no songs in the library
-			return null;
-
 		return song;
 	}
 
@@ -535,6 +532,7 @@ public final class SongTimeline {
 	 *
 	 * @param delta -1 to move to the previous song or 1 for the next.
 	 */
+	//FIXME: Ignores current shuffle mode
 	private void shiftCurrentSongInternal(int delta)
 	{
 		int pos = mCurrentPos + delta;
@@ -687,6 +685,7 @@ public final class SongTimeline {
 				}
 			}
 
+			//TODO remove this shuffle, as the songs should be added to timeline unshuffled
 			if (mShuffleMode != SHUFFLE_NONE)
 				MediaUtils.shuffle(timeline.subList(start, timeline.size()), mShuffleMode == SHUFFLE_ALBUMS);
 

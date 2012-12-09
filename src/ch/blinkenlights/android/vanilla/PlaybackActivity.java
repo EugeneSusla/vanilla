@@ -23,8 +23,8 @@
 package ch.blinkenlights.android.vanilla;
 
 import eugene.config.Config;
+import eugene.config.GestureMappingConfig;
 import eugene.gestures.BasicGesture;
-import eugene.gestures.GestureMappingUtils;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.ActionManager;
 import eugene.gestures.action.VanillaAction;
@@ -118,7 +118,7 @@ public abstract class PlaybackActivity extends Activity implements
 		else
 			startService(new Intent(this, PlaybackService.class));
 
-		mGestureListener = GestureMappingUtils.getGestureListener();
+		mGestureListener = GestureMappingConfig.getGestureListener();
 
 		SharedPreferences prefs = PlaybackService.getSettings(this);
 		Window window = getWindow();

@@ -1,6 +1,5 @@
 package eugene.gestures.action;
 
-import ch.blinkenlights.android.vanilla.Action;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.ioc.ComponentResolver;
 import eugene.utils.StringUtils;

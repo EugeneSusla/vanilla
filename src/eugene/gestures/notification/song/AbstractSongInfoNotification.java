@@ -5,6 +5,7 @@ import ch.blinkenlights.android.vanilla.CoverBitmap;
 import ch.blinkenlights.android.vanilla.Song;
 import eugene.gestures.notification.DrawableNotification;
 import eugene.ioc.ComponentResolver;
+import eugene.utils.StringUtils;
 
 public abstract class AbstractSongInfoNotification extends DrawableNotification {
 
@@ -14,15 +15,21 @@ public abstract class AbstractSongInfoNotification extends DrawableNotification 
 
 	@Override
 	public String asText() {
-//		return getSong().title + SEPARATOR + getSong().artist + SEPARATOR
-//				+ getSong().album;
-		return getSong().path;
+		Song song = getSong();
+		if (song == null) {
+			return "";
+		}
+		return song.title + SEPARATOR + song.artist + SEPARATOR + song.album;
 	}
 
 	@Override
 	public void draw(Canvas canvas) {
-		CoverBitmap.drawSongInfo(canvas, getSong(), canvas.getWidth(),
-				canvas.getHeight(), ComponentResolver.getCoverView()
-						.getContext());
+		Song song = getSong();
+		if (song != null) {
+			CoverBitmap
+					.drawSongInfo(canvas, song, canvas.getWidth(), canvas
+							.getHeight(), ComponentResolver.getCoverView()
+							.getContext());
+		}
 	}
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.blinkenlights.android.vanilla.MediaUtils;
+
 import android.database.DatabaseUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.ShoutNotificationImpl;
@@ -24,6 +26,7 @@ public enum Config {
 	 */
 	private boolean useLowProfileInCompactMode = true;
 	private boolean shoutBoxDrawSongInfoWhenIdle = true;
+	private boolean hideActionBarOnPlaybackScreen = true;  //default false
 	/**
 	 * 0 to 1 (percentage of total height)
 	 */
@@ -47,6 +50,7 @@ public enum Config {
 	private List<String> excludeFolders = new ArrayList<String>(
 			Arrays.asList("/storage/sdcard0/Music/_Books"));
 	private transient String folderFilterSQLPart = null;
+	private boolean sortByFilename = true;
 	
 	private int folderLimiterViewVerticalPadding = 17;	//default = 2
 	private int folderLimiterViewHorizontalPadding = 8;	//default = 5
@@ -211,5 +215,23 @@ public enum Config {
 	public void setFolderLimiterViewHorizontalPadding(
 			int folderLimiterViewHorizontalPadding) {
 		this.folderLimiterViewHorizontalPadding = folderLimiterViewHorizontalPadding;
+	}
+
+	public boolean isSortByFilename() {
+		return sortByFilename;
+	}
+
+	public void setSortByFilename(boolean sortByFilename) {
+		this.sortByFilename = sortByFilename;
+		MediaUtils.updateDefaultSort();
+	}
+
+	public boolean isHideActionBarOnPlaybackScreen() {
+		return hideActionBarOnPlaybackScreen;
+	}
+
+	public void setHideActionBarOnPlaybackScreen(
+			boolean hideActionBarOnPlaybackScreen) {
+		this.hideActionBarOnPlaybackScreen = hideActionBarOnPlaybackScreen;
 	}
 }

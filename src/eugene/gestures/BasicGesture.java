@@ -15,11 +15,11 @@ public class BasicGesture implements Cloneable {
 			Collections.unmodifiableList(Arrays.asList(Stroke.STATIC,
 					Stroke.STATIC)));
 
-
 	private static ConcurrentHashMap<Stroke, BasicGesture> mCache = new ConcurrentHashMap<Stroke, BasicGesture>();
 
 	private List<Stroke> gestureStrokes = new ArrayList<Stroke>(
 			Collections.singletonList(Stroke.STATIC));
+	private transient String toStringValue; // caches it's text representation
 
 	public BasicGesture() {
 	}
@@ -59,11 +59,14 @@ public class BasicGesture implements Cloneable {
 
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder();
-		for (Stroke stroke : gestureStrokes) {
-			result.append(Character.toUpperCase(stroke.name().charAt(0)));
+		if (toStringValue == null) {
+			StringBuilder result = new StringBuilder();
+			for (Stroke stroke : gestureStrokes) {
+				result.append(Character.toUpperCase(stroke.name().charAt(0)));
+			}
+			toStringValue = result.toString();
 		}
-		return result.toString();
+		return toStringValue;
 	}
 
 	@Override
@@ -81,7 +84,7 @@ public class BasicGesture implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public BasicGesture clone() {
 		return new BasicGesture(gestureStrokes);
 	}
 }

@@ -22,10 +22,6 @@
 
 package ch.blinkenlights.android.vanilla;
 
-import eugene.gestures.BasicGesture;
-import eugene.gestures.Stroke;
-import eugene.gestures.StrokeUtils;
-import eugene.gestures.notification.Shouter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,11 +31,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
+import eugene.gestures.BasicGesture;
+import eugene.gestures.StrokeUtils;
 
 /**
  * Displays a flingable/draggable View of cover art/song info images generated
@@ -592,6 +591,7 @@ public final class CoverView extends View implements Handler.Callback {
 	}
 
 	public void setCurrentGesture(BasicGesture newGesture) {
+		Log.d("CoverView", "setCurrentGesture " + newGesture);
 		if (mCurrentGesture == null || !mCurrentGesture.equals(newGesture)) {
 			this.mCurrentGesture = newGesture;
 			onMidwayGesture(mCurrentGesture);

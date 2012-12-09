@@ -114,6 +114,9 @@ THE SOFTWARE.
 		<item name="android:actionBarStyle">@style/PlaybackActionBar</item>
 		<item name="android:windowBackground">@android:color/black</item>
 	</style>
+	<style name="PlaybackWithoutActionBar" parent="android:Theme.Holo.NoActionBar">
+		<item name="android:windowBackground">@android:color/black</item>
+	</style>
 	<style name="BackActionBar" parent="android:Theme.Holo">
 		<item name="android:actionBarStyle">@style/PlaybackActionBar</item>
 	</style>

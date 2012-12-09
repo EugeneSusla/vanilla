@@ -27,6 +27,8 @@ import java.util.Arrays;
 import eugene.config.Config;
 import eugene.gestures.BasicGesture;
 import eugene.gestures.Stroke;
+import eugene.gestures.action.ActionManager;
+import eugene.gestures.action.impl.ShowQueueAction;
 import eugene.gestures.notification.Shouter;
 import eugene.gestures.notification.song.CurrentSongNotification;
 import eugene.gestures.notification.view.ShoutBoxView;
@@ -66,7 +68,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	private TextView mOverlayText;
 	private View mControlsTop;
 	private View mControlsBottom;
-	
+
 	private ShoutBoxView shoutBoxView;
 
 	private SeekBar mSeekBar;
@@ -98,8 +100,6 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	 * The current display mode, which determines layout and cover render style.
 	 */
 	private int mDisplayMode;
-
-	
 
 	/**
 	 * Cached StringBuilder for formatting track position.
@@ -152,6 +152,9 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			break;
 		}
 
+		if (Config.INSTANCE.isHideActionBarOnPlaybackScreen()) {
+			setTheme(R.style.PlaybackWithoutActionBar);
+		}
 		setContentView(layout);
 
 		CoverView coverView = (CoverView) findViewById(R.id.cover_view);
@@ -159,7 +162,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		coverView.setOnClickListener(this);
 		coverView.setOnLongClickListener(this);
 		mCoverView = coverView;
-		
+
 		shoutBoxView = (ShoutBoxView) findViewById(R.id.shoutbox_view);
 
 		mControlsBottom = findViewById(R.id.controls_bottom);
@@ -206,10 +209,11 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO,
 				false));
 		setDuration(0);
-		
+
 		ComponentResolver.setFullPlaybackActivity(this);
 	}
 
+	// TODO delete
 	public void shout(String message) {
 		if (mAlbum != null) {
 			mAlbum.setText(message);
@@ -226,8 +230,6 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			finish();
 			startActivity(new Intent(this, FullPlaybackActivity.class));
 		}
-
-//		Shouter.shout(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString());
 	}
 
 	@Override
@@ -236,7 +238,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		mPaused = false;
 		updateElapsedTime();
 	}
-	
+
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
@@ -332,7 +334,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		if (mExtraInfoVisible) {
 			mHandler.sendEmptyMessage(MSG_LOAD_EXTRA_INFO);
 		}
-		
+
 		Shouter.shout(CurrentSongNotification.INSTANCE);
 	}
 
@@ -374,20 +376,22 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			menu.add(0, MENU_LIBRARY, 0, R.string.library).setIcon(
-					R.drawable.ic_menu_music_library);
+			menu.add(Menu.NONE, MENU_LIBRARY, Menu.NONE, R.string.library)
+					.setIcon(R.drawable.ic_menu_music_library);
 		}
 		super.onCreateOptionsMenu(menu);
-		menu.add(0, MENU_CLEAR_QUEUE, 0, R.string.clear_queue).setIcon(
-				R.drawable.ic_menu_close_clear_cancel);
-		menu.add(0, MENU_ENQUEUE_ALBUM, 0, R.string.enqueue_current_album)
+		menu.add(Menu.NONE, MENU_CLEAR_QUEUE, Menu.NONE, R.string.clear_queue)
+				.setIcon(R.drawable.ic_menu_close_clear_cancel);
+		menu.add(Menu.NONE, MENU_ENQUEUE_ALBUM, Menu.NONE,
+				R.string.enqueue_current_album).setIcon(R.drawable.ic_menu_add);
+		menu.add(Menu.NONE, MENU_ENQUEUE_ARTIST, Menu.NONE,
+				R.string.enqueue_current_artist)
 				.setIcon(R.drawable.ic_menu_add);
-		menu.add(0, MENU_ENQUEUE_ARTIST, 0, R.string.enqueue_current_artist)
-				.setIcon(R.drawable.ic_menu_add);
-		menu.add(0, MENU_ENQUEUE_GENRE, 0, R.string.enqueue_current_genre)
-				.setIcon(R.drawable.ic_menu_add);
-		menu.add(0, MENU_TOGGLE_CONTROLS, 0, R.string.toggle_controls);
-		menu.add(0, MENU_SHOW_QUEUE, 0, R.string.show_queue);
+		menu.add(Menu.NONE, MENU_ENQUEUE_GENRE, Menu.NONE,
+				R.string.enqueue_current_genre).setIcon(R.drawable.ic_menu_add);
+		menu.add(Menu.NONE, MENU_TOGGLE_CONTROLS, Menu.NONE,
+				R.string.toggle_controls);
+		menu.add(Menu.NONE, MENU_SHOW_QUEUE, Menu.NONE, R.string.show_queue);
 		return true;
 	}
 
@@ -416,7 +420,8 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			mHandler.sendEmptyMessage(MSG_SAVE_CONTROLS);
 			break;
 		case MENU_SHOW_QUEUE:
-			startActivity(new Intent(this, ShowQueueActivity.class));
+//			startActivity(new Intent(this, ShowQueueActivity.class));
+			ActionManager.INSTANCE.invoke(ShowQueueAction.class);
 			break;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -503,12 +508,12 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			shoutBoxView.setVisibility(oppositeMode);
 		}
 		mControlsVisible = visible;
-		
+
 		if (visible) {
 			mPlayPauseButton.requestFocus();
 			updateElapsedTime();
 		}
-		
+
 		updateLowProfileDim();
 	}
 
@@ -737,7 +742,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	public boolean onLongClick(View view) {
 		switch (view.getId()) {
 		case R.id.cover_view:
-			mCoverView.setCurrentGesture(BasicGesture.LONG_TAP);
+			mCoverView.setCurrentGesture(BasicGesture.LONG_TAP.clone());
 			break;
 		case R.id.info_table:
 			setExtraInfoVisible(!mExtraInfoVisible);

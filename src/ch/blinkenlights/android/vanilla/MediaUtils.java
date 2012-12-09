@@ -75,11 +75,15 @@ public class MediaUtils {
 	public static final int TYPE_COUNT = 6;
 
 	/**
-	 * The default sort order for media queries. First artist, then album, then
+	 * The default sort order for media queries. Either filename or first artist, then album, then
 	 * track number.
 	 */
-	public static final String DEFAULT_SORT = "artist_key,album_key,track";
-
+	public static String DEFAULT_SORT;
+	
+	static {
+		updateDefaultSort();
+	}
+	
 	/**
 	 * Cached random instance.
 	 */
@@ -112,6 +116,10 @@ public class MediaUtils {
 		if (sRandom == null)
 			sRandom = new Random();
 		return sRandom;
+	}
+	
+	public static void updateDefaultSort() {
+		DEFAULT_SORT = Config.INSTANCE.isSortByFilename() ? "_data" : "artist_key,album_key,track";
 	}
 
 	/**
@@ -541,13 +549,13 @@ public class MediaUtils {
 		return result;
 	}
 	
-	private static String appendFolderFilter(String selection) {
-		StringBuilder result = new StringBuilder(selection);
+	public static String appendFolderFilter(String selection) {
+		StringBuilder result = selection == null ? new StringBuilder() : new StringBuilder(selection);
 		appendFolderFilter(result);
 		return result.toString();
 	}
 	
-	private static void appendFolderFilter(StringBuilder selection) {
+	public static void appendFolderFilter(StringBuilder selection) {
 		String folderFilterSQLPart = Config.INSTANCE.getFolderFilterSQLPart();
 		if (selection.length() > 0) {
 			selection.append(" AND ");

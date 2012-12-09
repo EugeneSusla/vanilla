@@ -10,7 +10,7 @@ public enum ActionManager {
 	
 	private static final String VANILLA_ACTION_PREFIX = "vanillaAction://";
 	private static final String CLASS_PREFIX = "class://";
-	private ConcurrentHashMap<String, Action> actionCache = new ConcurrentHashMap<String, Action>();
+	private transient ConcurrentHashMap<String, Action> actionCache = new ConcurrentHashMap<String, Action>();
 	
 	public Action getActionBySettingsName(String settingsName) {
 		Action cachedAction = actionCache.get(settingsName);
@@ -57,5 +57,13 @@ public enum ActionManager {
 			return (VanillaAction) getActionInstance(PlayPauseAction.class);
 		}
 		return (VanillaAction) getActionBySettingsName(VANILLA_ACTION_PREFIX + vanillaAction.name());
+	}
+	
+	public void invoke(Class<? extends Action> actionClass) {
+		getActionInstance(actionClass).invoke();
+	}
+	
+	public void invoke(ch.blinkenlights.android.vanilla.Action vanillaAction) {
+		getVanillaAction(vanillaAction).invoke();
 	}
 }

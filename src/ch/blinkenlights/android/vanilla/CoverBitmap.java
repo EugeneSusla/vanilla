@@ -36,7 +36,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import eugene.config.Config;
 
@@ -239,13 +238,10 @@ public final class CoverBitmap {
 
 	public static void drawText(Canvas canvas, String text, int maxWidth,
 			int maxHeight, Context context) {
-		Log.d(CoverBitmap.class.getSimpleName(), "Going to draw text: " + text);
 		Paint paint = initDrawing(context);
 		int fontSize = TEXT_SIZE_BIG;
 		Rect textBoxDimensions = measureTextBox(text, fontSize, maxWidth,
 				maxHeight, paint);
-		Log.d(CoverBitmap.class.getSimpleName(), "Text width is: "
-				+ textBoxDimensions.right);
 		drawText(text, fontSize, paint, textBoxDimensions, maxWidth, maxHeight,
 				canvas);
 	}

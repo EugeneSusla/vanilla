@@ -254,8 +254,10 @@ public class MediaAdapter
 		}
 		String sort = String.format(mSortValues[mode], sortDir);
 
-		if (mType == MediaUtils.TYPE_SONG || forceMusicCheck)
+		if (mType == MediaUtils.TYPE_SONG || forceMusicCheck) {
 			selection.append("is_music!=0");
+			MediaUtils.appendFolderFilter(selection);
+		}
 
 		if (constraint != null && constraint.length() != 0) {
 			String[] needles;
