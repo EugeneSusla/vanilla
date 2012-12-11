@@ -90,6 +90,8 @@ public abstract class PlaybackActivity extends Activity implements
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
 
+		setRequestedOrientation(Config.INSTANCE.getScreenOrientation());
+		
 		PlaybackService.addActivity(this);
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);

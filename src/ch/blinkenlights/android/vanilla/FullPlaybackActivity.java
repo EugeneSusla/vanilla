@@ -22,17 +22,6 @@
 
 package ch.blinkenlights.android.vanilla;
 
-import java.util.Arrays;
-
-import eugene.config.Config;
-import eugene.gestures.BasicGesture;
-import eugene.gestures.Stroke;
-import eugene.gestures.action.ActionManager;
-import eugene.gestures.action.impl.ShowQueueAction;
-import eugene.gestures.notification.Shouter;
-import eugene.gestures.notification.song.CurrentSongNotification;
-import eugene.gestures.notification.view.ShoutBoxView;
-import eugene.ioc.ComponentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -40,7 +29,6 @@ import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -55,6 +43,14 @@ import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import eugene.config.Config;
+import eugene.gestures.BasicGesture;
+import eugene.gestures.action.ActionManager;
+import eugene.gestures.action.impl.ShowQueueAction;
+import eugene.gestures.notification.Shouter;
+import eugene.gestures.notification.song.CurrentSongNotification;
+import eugene.gestures.notification.view.ShoutBoxView;
+import eugene.ioc.ComponentResolver;
 
 /**
  * The primary playback screen with playback controls and large cover display.
@@ -128,8 +124,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		setTitle(R.string.playback_view);
 
 		SharedPreferences settings = PlaybackService.getSettings(this);
-		int displayMode = Integer.parseInt(settings.getString(
-				PrefKeys.DISPLAY_MODE, "2"));
+		int displayMode = Integer.parseInt(settings.getString(PrefKeys.DISPLAY_MODE, "2"));
 		mDisplayMode = displayMode;
 
 		int layout = R.layout.full_playback;
@@ -137,8 +132,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 
 		switch (displayMode) {
 		default:
-			Log.w("VanillaMusic",
-					"Invalid display mode given. Defaulting to widget mode.");
+			Log.w("VanillaMusic", "Invalid display mode given. Defaulting to widget mode.");
 			// fall through
 		case DISPLAY_INFO_WIDGETS:
 			coverStyle = CoverBitmap.STYLE_NO_INFO;
@@ -206,8 +200,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		registerForContextMenu(mEndButton);
 
 		setControlsVisible(settings.getBoolean(PrefKeys.VISIBLE_CONTROLS, true));
-		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO,
-				false));
+		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO, false));
 		setDuration(0);
 
 		ComponentResolver.setFullPlaybackActivity(this);
@@ -225,8 +218,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		super.onStart();
 
 		SharedPreferences settings = PlaybackService.getSettings(this);
-		if (mDisplayMode != Integer.parseInt(settings.getString(
-				PrefKeys.DISPLAY_MODE, "2"))) {
+		if (mDisplayMode != Integer.parseInt(settings.getString(PrefKeys.DISPLAY_MODE, "2"))) {
 			finish();
 			startActivity(new Intent(this, FullPlaybackActivity.class));
 		}
@@ -277,8 +269,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			// Make the view clickable so it eats touch events
 			view.setClickable(true);
 			view.setOnClickListener(this);
-			addContentView(view, new ViewGroup.LayoutParams(
-					LinearLayout.LayoutParams.MATCH_PARENT,
+			addContentView(view, new ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
 					LinearLayout.LayoutParams.MATCH_PARENT));
 			mOverlayText = view;
 		} else {
@@ -369,28 +360,25 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	 */
 	private void setDuration(long duration) {
 		mDuration = duration;
-		mDurationView.setText(DateUtils.formatElapsedTime(mTimeBuilder,
-				duration / 1000));
+		mDurationView.setText(DateUtils.formatElapsedTime(mTimeBuilder, duration / 1000));
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			menu.add(Menu.NONE, MENU_LIBRARY, Menu.NONE, R.string.library)
-					.setIcon(R.drawable.ic_menu_music_library);
+			menu.add(Menu.NONE, MENU_LIBRARY, Menu.NONE, R.string.library).setIcon(
+					R.drawable.ic_menu_music_library);
 		}
 		super.onCreateOptionsMenu(menu);
-		menu.add(Menu.NONE, MENU_CLEAR_QUEUE, Menu.NONE, R.string.clear_queue)
-				.setIcon(R.drawable.ic_menu_close_clear_cancel);
-		menu.add(Menu.NONE, MENU_ENQUEUE_ALBUM, Menu.NONE,
-				R.string.enqueue_current_album).setIcon(R.drawable.ic_menu_add);
-		menu.add(Menu.NONE, MENU_ENQUEUE_ARTIST, Menu.NONE,
-				R.string.enqueue_current_artist)
+		menu.add(Menu.NONE, MENU_CLEAR_QUEUE, Menu.NONE, R.string.clear_queue).setIcon(
+				R.drawable.ic_menu_close_clear_cancel);
+		menu.add(Menu.NONE, MENU_ENQUEUE_ALBUM, Menu.NONE, R.string.enqueue_current_album).setIcon(
+				R.drawable.ic_menu_add);
+		menu.add(Menu.NONE, MENU_ENQUEUE_ARTIST, Menu.NONE, R.string.enqueue_current_artist)
 				.setIcon(R.drawable.ic_menu_add);
-		menu.add(Menu.NONE, MENU_ENQUEUE_GENRE, Menu.NONE,
-				R.string.enqueue_current_genre).setIcon(R.drawable.ic_menu_add);
-		menu.add(Menu.NONE, MENU_TOGGLE_CONTROLS, Menu.NONE,
-				R.string.toggle_controls);
+		menu.add(Menu.NONE, MENU_ENQUEUE_GENRE, Menu.NONE, R.string.enqueue_current_genre).setIcon(
+				R.drawable.ic_menu_add);
+		menu.add(Menu.NONE, MENU_TOGGLE_CONTROLS, Menu.NONE, R.string.toggle_controls);
 		menu.add(Menu.NONE, MENU_SHOW_QUEUE, Menu.NONE, R.string.show_queue);
 		return true;
 	}
@@ -406,8 +394,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			PlaybackService.get(this).enqueueFromCurrent(MediaUtils.TYPE_ALBUM);
 			break;
 		case MENU_ENQUEUE_ARTIST:
-			PlaybackService.get(this)
-					.enqueueFromCurrent(MediaUtils.TYPE_ARTIST);
+			PlaybackService.get(this).enqueueFromCurrent(MediaUtils.TYPE_ARTIST);
 			break;
 		case MENU_ENQUEUE_GENRE:
 			PlaybackService.get(this).enqueueFromCurrent(MediaUtils.TYPE_GENRE);
@@ -420,7 +407,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			mHandler.sendEmptyMessage(MSG_SAVE_CONTROLS);
 			break;
 		case MENU_SHOW_QUEUE:
-//			startActivity(new Intent(this, ShowQueueActivity.class));
+			// startActivity(new Intent(this, ShowQueueActivity.class));
 			ActionManager.INSTANCE.invoke(ShowQueueAction.class);
 			break;
 		default:
@@ -469,20 +456,16 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	 * Update seek bar progress and schedule another update in one second
 	 */
 	private void updateElapsedTime() {
-		long position = PlaybackService.hasInstance() ? PlaybackService.get(
-				this).getPosition() : 0;
+		long position = PlaybackService.hasInstance() ? PlaybackService.get(this).getPosition() : 0;
 
 		if (!mSeekBarTracking) {
 			long duration = mDuration;
-			mSeekBar.setProgress(duration == 0 ? 0
-					: (int) (1000 * position / duration));
+			mSeekBar.setProgress(duration == 0 ? 0 : (int) (1000 * position / duration));
 		}
 
-		mElapsedView.setText(DateUtils.formatElapsedTime(mTimeBuilder,
-				position / 1000));
+		mElapsedView.setText(DateUtils.formatElapsedTime(mTimeBuilder, position / 1000));
 
-		if (!mPaused && mControlsVisible
-				&& (mState & PlaybackService.FLAG_PLAYING) != 0) {
+		if (!mPaused && mControlsVisible && (mState & PlaybackService.FLAG_PLAYING) != 0) {
 			// Try to update right after the duration increases by one second
 			long next = 1050 - position % 1000;
 			mUiHandler.removeMessages(MSG_UPDATE_PROGRESS);
@@ -518,18 +501,15 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	}
 
 	private void updateLowProfileDim() {
-		boolean lowProfileToggleEnabled = Config.INSTANCE
-				.isUseLowProfileInCompactMode();
+		boolean lowProfileToggleEnabled = Config.INSTANCE.isUseLowProfileInCompactMode();
 		if (mControlsVisible) {
 			if (lowProfileToggleEnabled
 					|| ((getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0)) {
-				getWindow().getDecorView().setSystemUiVisibility(
-						View.SYSTEM_UI_FLAG_VISIBLE);
+				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 			}
 		} else {
 			if (lowProfileToggleEnabled) {
-				getWindow().getDecorView().setSystemUiVisibility(
-						View.SYSTEM_UI_FLAG_LOW_PROFILE);
+				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			}
 		}
 	}
@@ -581,19 +561,14 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
 			CompatMetadata data = new CompatMetadata(song.path);
 
-			mGenre = data
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
-			mTrack = data
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
-			String composer = data
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER);
+			mGenre = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
+			mTrack = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
+			String composer = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER);
 			if (composer == null)
-				composer = data
-						.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER);
+				composer = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER);
 			mComposer = composer;
 
-			String year = data
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR);
+			String year = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR);
 			if (year == null || "0".equals(year)) {
 				year = null;
 			} else {
@@ -606,8 +581,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 			StringBuilder sb = new StringBuilder(12);
 			sb.append(decodeMimeType(data
 					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)));
-			String bitrate = data
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
+			String bitrate = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
 			if (bitrate != null && bitrate.length() > 3) {
 				sb.append(' ');
 				sb.append(bitrate.substring(0, bitrate.length() - 3));
@@ -663,8 +637,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	public boolean handleMessage(Message message) {
 		switch (message.what) {
 		case MSG_SAVE_CONTROLS: {
-			SharedPreferences.Editor editor = PlaybackService.getSettings(this)
-					.edit();
+			SharedPreferences.Editor editor = PlaybackService.getSettings(this).edit();
 			editor.putBoolean("visible_controls", mControlsVisible);
 			editor.putBoolean("visible_extra_info", mExtraInfoVisible);
 			editor.commit();
@@ -695,11 +668,10 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	}
 
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress,
-			boolean fromUser) {
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		if (fromUser) {
-			mElapsedView.setText(DateUtils.formatElapsedTime(mTimeBuilder,
-					progress * mDuration / 1000000));
+			mElapsedView.setText(DateUtils.formatElapsedTime(mTimeBuilder, progress * mDuration
+					/ 1000000));
 			PlaybackService.get(this).seekToProgress(progress);
 		}
 	}
@@ -725,10 +697,8 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 
 	@Override
 	public void onClick(View view) {
-		if (view == mOverlayText
-				&& (mState & PlaybackService.FLAG_EMPTY_QUEUE) != 0) {
-			setState(PlaybackService.get(this).setFinishAction(
-					SongTimeline.FINISH_RANDOM));
+		if (view == mOverlayText && (mState & PlaybackService.FLAG_EMPTY_QUEUE) != 0) {
+			setState(PlaybackService.get(this).setFinishAction(SongTimeline.FINISH_RANDOM));
 		} else if (view == getCoverView()) {
 			// tap action handled by gesture mechanism
 		} else if (view.getId() == R.id.info_table) {

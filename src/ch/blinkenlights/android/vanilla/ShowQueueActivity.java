@@ -24,6 +24,8 @@ package ch.blinkenlights.android.vanilla;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import eugene.config.Config;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -44,6 +46,7 @@ public class ShowQueueActivity extends Activity {
 		
 		setTitle(R.string.queue);
 		setContentView(R.layout.showqueue_listview);
+		setRequestedOrientation(Config.INSTANCE.getScreenOrientation());
 		
 		
 		mListView   = (ListView) findViewById(R.id.list);

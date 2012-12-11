@@ -25,6 +25,8 @@ package ch.blinkenlights.android.vanilla;
 
 import java.util.List;
 
+import eugene.config.Config;
+
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -46,20 +48,18 @@ public class PreferencesActivity extends PreferenceActivity {
 	 * Initialize the activity, loading the preference specifications.
 	 */
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setRequestedOrientation(Config.INSTANCE.getScreenOrientation());
 	}
 
 	@Override
-	public void onBuildHeaders(List<Header> target)
-	{
+	public void onBuildHeaders(List<Header> target) {
 		loadHeadersFromResource(R.xml.preference_headers, target);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
+	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == android.R.id.home) {
 			finish();
 			return true;
@@ -71,8 +71,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static class AudioActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_audio);
 		}
@@ -80,8 +79,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class AudioFragment extends PreferenceFragment {
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_audio);
 		}
@@ -90,8 +88,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static class PlaybackActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_playback);
 		}
@@ -99,8 +96,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class PlaybackFragment extends PreferenceFragment {
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_playback);
 		}
@@ -109,8 +105,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static class LibraryActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_library);
 		}
@@ -118,8 +113,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class LibraryFragment extends PreferenceFragment {
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_library);
 			PreferenceGroup group = getPreferenceScreen();
@@ -130,8 +124,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static class NotificationsActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_notifications);
 		}
@@ -139,8 +132,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class NotificationsFragment extends PreferenceFragment {
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_notifications);
 		}
@@ -149,8 +141,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static class ShakeActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_shake);
 		}
@@ -158,8 +149,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class ShakeFragment extends PreferenceFragment {
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_shake);
 		}
@@ -168,8 +158,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static class MiscActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_misc);
 		}
@@ -177,8 +166,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class MiscFragment extends PreferenceFragment {
 		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preference_misc);
 		}
@@ -186,8 +174,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class AboutActivity extends Activity {
 		@Override
-		public void onCreate(Bundle state)
-		{
+		public void onCreate(Bundle state) {
 			super.onCreate(state);
 
 			WebView view = new WebView(this);
@@ -200,9 +187,9 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class AboutFragment extends WebViewFragment {
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-		{
-			WebView view = (WebView)super.onCreateView(inflater, container, savedInstanceState);
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			WebView view = (WebView) super.onCreateView(inflater, container, savedInstanceState);
 			view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 			view.getSettings().setJavaScriptEnabled(true);
 			view.loadUrl("file:///android_asset/about.html");

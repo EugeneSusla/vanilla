@@ -7,6 +7,7 @@ import java.util.List;
 
 import ch.blinkenlights.android.vanilla.MediaUtils;
 
+import android.content.pm.ActivityInfo;
 import android.database.DatabaseUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.ShoutNotificationImpl;
@@ -18,7 +19,8 @@ public enum Config {
 	INSTANCE;
 
 	private int gestureStrokeMinPixelThreshold = 10;
-	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl(
+	// TODO make non-transient
+	private transient ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl(
 			"Unrecognized Gesture");
 	/**
 	 * Dim screen in compact mode. Includes software buttons and navigation
@@ -26,7 +28,8 @@ public enum Config {
 	 */
 	private boolean useLowProfileInCompactMode = true;
 	private boolean shoutBoxDrawSongInfoWhenIdle = true;
-	private boolean hideActionBarOnPlaybackScreen = true;  //default false
+	/** This may require restart */
+	private boolean hideActionBarOnPlaybackScreen = true; // default false
 	/**
 	 * 0 to 1 (percentage of total height)
 	 */
@@ -45,16 +48,23 @@ public enum Config {
 			.shouldConvertFromEncoding(defaultCharset);
 	private boolean smartDetectAdditionalLatin = true;
 
-	private List<String> includeFolders = new ArrayList<String>(Arrays.asList(
+	// TODO make non-transient
+	private transient List<String> includeFolders = new ArrayList<String>(Arrays.asList(
 			"/storage/sdcard0/_Autosync/Audio", "/storage/sdcard0/Music"));
-	private List<String> excludeFolders = new ArrayList<String>(
+	// TODO make non-transient
+	private transient List<String> excludeFolders = new ArrayList<String>(
 			Arrays.asList("/storage/sdcard0/Music/_Books"));
 	private transient String folderFilterSQLPart = null;
 	private boolean sortByFilename = true;
-	
-	private int folderLimiterViewVerticalPadding = 17;	//default = 2
-	private int folderLimiterViewHorizontalPadding = 8;	//default = 5
+
+	private int folderLimiterViewVerticalPadding = 17; // default = 2
+	private int folderLimiterViewHorizontalPadding = 8; // default = 5
 	private boolean folderLimiterDisplayX = false;
+
+	// TODO make non-transient
+	// Effectively enum: ActivityInfo.SCREEN_ORIENTATION_*
+	private transient int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT; // default
+																						// ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
 
 	/*-------------------------------------------------------------------*/
 
@@ -62,8 +72,7 @@ public enum Config {
 		return gestureStrokeMinPixelThreshold;
 	}
 
-	public void setGestureStrokeMinPixelThreshold(
-			int gestureStrokeMinPixelThreshold) {
+	public void setGestureStrokeMinPixelThreshold(int gestureStrokeMinPixelThreshold) {
 		this.gestureStrokeMinPixelThreshold = gestureStrokeMinPixelThreshold;
 	}
 
@@ -71,8 +80,7 @@ public enum Config {
 		return unrecognisedGestureNotification;
 	}
 
-	public void setUnrecognisedGestureNotification(
-			ShoutNotification unrecognisedGestureNotification) {
+	public void setUnrecognisedGestureNotification(ShoutNotification unrecognisedGestureNotification) {
 		this.unrecognisedGestureNotification = unrecognisedGestureNotification;
 	}
 
@@ -96,8 +104,7 @@ public enum Config {
 		return shoutBoxDrawSongInfoWhenIdle;
 	}
 
-	public void setShoutBoxDrawSongInfoWhenIdle(
-			boolean shoutBoxDrawSongInfoWhenIdle) {
+	public void setShoutBoxDrawSongInfoWhenIdle(boolean shoutBoxDrawSongInfoWhenIdle) {
 		this.shoutBoxDrawSongInfoWhenIdle = shoutBoxDrawSongInfoWhenIdle;
 	}
 
@@ -121,8 +128,7 @@ public enum Config {
 		return librarySwapArrowAndMainBodyAction;
 	}
 
-	public void setLibrarySwapArrowAndMainBodyAction(
-			boolean librarySwapArrowAndMainBodyAction) {
+	public void setLibrarySwapArrowAndMainBodyAction(boolean librarySwapArrowAndMainBodyAction) {
 		this.librarySwapArrowAndMainBodyAction = librarySwapArrowAndMainBodyAction;
 	}
 
@@ -130,8 +136,7 @@ public enum Config {
 		return libraryGoToPlaybackOnFolderAction;
 	}
 
-	public void setLibraryGoToPlaybackOnFolderAction(
-			boolean libraryGoToPlaylistOnFolderAction) {
+	public void setLibraryGoToPlaybackOnFolderAction(boolean libraryGoToPlaylistOnFolderAction) {
 		this.libraryGoToPlaybackOnFolderAction = libraryGoToPlaylistOnFolderAction;
 	}
 
@@ -139,8 +144,7 @@ public enum Config {
 		return libraryExpandFolderActionOn;
 	}
 
-	public void setLibraryExpandFolderActionOn(
-			boolean libraryExpandFolderActionOn) {
+	public void setLibraryExpandFolderActionOn(boolean libraryExpandFolderActionOn) {
 		this.libraryExpandFolderActionOn = libraryExpandFolderActionOn;
 	}
 
@@ -150,8 +154,7 @@ public enum Config {
 
 	public void setDefaultCharset(String defaultCharset) {
 		this.defaultCharset = defaultCharset;
-		performCharsetConversion = EncodingUtils
-				.shouldConvertFromEncoding(defaultCharset);
+		performCharsetConversion = EncodingUtils.shouldConvertFromEncoding(defaultCharset);
 	}
 
 	public boolean isPerformCharsetConversion() {
@@ -195,8 +198,7 @@ public enum Config {
 		return folderLimiterViewVerticalPadding;
 	}
 
-	public void setFolderLimiterViewVerticalPadding(
-			int folderLimiterViewVerticalPadding) {
+	public void setFolderLimiterViewVerticalPadding(int folderLimiterViewVerticalPadding) {
 		this.folderLimiterViewVerticalPadding = folderLimiterViewVerticalPadding;
 	}
 
@@ -212,8 +214,7 @@ public enum Config {
 		return folderLimiterViewHorizontalPadding;
 	}
 
-	public void setFolderLimiterViewHorizontalPadding(
-			int folderLimiterViewHorizontalPadding) {
+	public void setFolderLimiterViewHorizontalPadding(int folderLimiterViewHorizontalPadding) {
 		this.folderLimiterViewHorizontalPadding = folderLimiterViewHorizontalPadding;
 	}
 
@@ -230,8 +231,15 @@ public enum Config {
 		return hideActionBarOnPlaybackScreen;
 	}
 
-	public void setHideActionBarOnPlaybackScreen(
-			boolean hideActionBarOnPlaybackScreen) {
+	public void setHideActionBarOnPlaybackScreen(boolean hideActionBarOnPlaybackScreen) {
 		this.hideActionBarOnPlaybackScreen = hideActionBarOnPlaybackScreen;
+	}
+
+	public int getScreenOrientation() {
+		return screenOrientation;
+	}
+
+	public void setScreenOrientation(int screenOrientation) {
+		this.screenOrientation = screenOrientation;
 	}
 }
