@@ -5,13 +5,41 @@ import java.io.UnsupportedEncodingException;
 import eugene.config.Config;
 
 public class StringUtils {
+	private static final String CAMEL_CASE_REGEX = String.format("%s|%s|%s",
+			"(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])");
+
 	private StringUtils() {
 	}
 
 	public static String camelCaseToPlainString(String camelCaseString) {
-		return camelCaseString.replaceAll(String.format("%s|%s|%s",
-				"(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])",
-				"(?<=[A-Za-z])(?=[^A-Za-z])"), " ");
+		return camelCaseString.replaceAll(CAMEL_CASE_REGEX, " ");
+	}
+
+	public static String camelCaseToUnderscoreLowerCase(String camelCaseString) {
+		return camelCaseToUnderscore(camelCaseString).toLowerCase();
+	}
+
+	public static String camelCaseToUnderscoreUpperCase(String camelCaseString) {
+		return camelCaseToUnderscore(camelCaseString).toUpperCase();
+	}
+
+	public static String camelCaseToUnderscore(String camelCaseString) {
+		return camelCaseString.replaceAll(CAMEL_CASE_REGEX, "_");
+	}
+
+	public static String underscoreToCamelCaseFirstCapital(String lowercaseUnderscoreString) {
+		String[] words = lowercaseUnderscoreString.split("_");
+		StringBuilder result = new StringBuilder();
+		for (String word : words) {
+			if (word.isEmpty()) {
+				continue;
+			}
+			result.append(Character.toUpperCase(word.charAt(0)));
+			if (word.length() > 1) {
+				result.append(word.substring(1).toLowerCase());
+			}
+		}
+		return result.toString();
 	}
 
 	public static String decode(String input) {
@@ -24,14 +52,12 @@ public class StringUtils {
 
 		// Quick-detect a unicode string being passed by looking at middle
 		// character
-		if (inputLength == 0
-				|| (((int) input.charAt(inputLength / 2)) | 0xff) != 0xff) {
+		if (inputLength == 0 || (((int) input.charAt(inputLength / 2)) | 0xff) != 0xff) {
 			return input;
 		}
 
 		// Smart detect init start
-		boolean smartDetectAdditionalLatin = Config.INSTANCE
-				.isSmartDetectAdditionalLatin();
+		boolean smartDetectAdditionalLatin = Config.INSTANCE.isSmartDetectAdditionalLatin();
 		boolean smartDetectFinished = false;
 		float maximumNonAsciiCharacterPercentInWord = 0f;
 		// consider non-ascii symbols dominating the word if beyond threshold

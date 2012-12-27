@@ -26,10 +26,11 @@ public enum Config {
 	 * Dim screen in compact mode. Includes software buttons and navigation
 	 * panel.
 	 */
-	private boolean useLowProfileInCompactMode = true;
+	private boolean useLowProfileInCompactMode = true;	//default false
 	private boolean shoutBoxDrawSongInfoWhenIdle = true;
 	/** This may require restart */
 	private boolean hideActionBarOnPlaybackScreen = true; // default false
+	private boolean hideNotificationBarInCompactMode = false;  // default false
 	/**
 	 * 0 to 1 (percentage of total height)
 	 */
@@ -241,5 +242,13 @@ public enum Config {
 
 	public void setScreenOrientation(int screenOrientation) {
 		this.screenOrientation = screenOrientation;
+	}
+
+	public boolean isHideNotificationBarInCompactMode() {
+		return hideNotificationBarInCompactMode;
+	}
+
+	public void setHideNotificationBarInCompactMode(boolean hideNotificationBarInCompactMode) {
+		this.hideNotificationBarInCompactMode = hideNotificationBarInCompactMode;
 	}
 }
