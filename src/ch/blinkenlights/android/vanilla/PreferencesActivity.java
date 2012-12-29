@@ -26,6 +26,7 @@ package ch.blinkenlights.android.vanilla;
 import java.util.List;
 
 import eugene.config.Config;
+import eugene.instapreferences.InstaPreference;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -44,6 +45,8 @@ import android.webkit.WebViewFragment;
  * The preferences activity in which one can change application preferences.
  */
 public class PreferencesActivity extends PreferenceActivity {
+	private static InstaPreference instaPreference = new InstaPreference();
+	
 	/**
 	 * Initialize the activity, loading the preference specifications.
 	 */
@@ -155,6 +158,23 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 	}
 
+	public static class GesturePlayerActivity extends PreferenceActivity {
+		@SuppressWarnings("deprecation")
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			instaPreference.addToPreferenceActivity(this, Config.INSTANCE);
+		}
+	}
+
+	public static class GesturePlayerFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			instaPreference.addToPreferenceFragment(this, Config.INSTANCE);
+		}
+	}
+	
 	public static class MiscActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override

@@ -1,11 +1,14 @@
 package eugene.instapreferences.listener;
 
+import eugene.config.Config;
 import eugene.utils.StringUtils;
 import android.preference.Preference;
 
 public class SetterInvokeOnPreferenceChangeListener implements
 		Preference.OnPreferenceChangeListener {
 
+	public static final SetterInvokeOnPreferenceChangeListener INSTANCE = new SetterInvokeOnPreferenceChangeListener(Config.INSTANCE);
+	
 	private final Object configBean;
 
 	public SetterInvokeOnPreferenceChangeListener(Object conficBean) {

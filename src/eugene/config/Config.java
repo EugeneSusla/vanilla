@@ -11,6 +11,8 @@ import android.content.pm.ActivityInfo;
 import android.database.DatabaseUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.ShoutNotificationImpl;
+import eugene.instapreferences.annotation.Hide;
+import eugene.instapreferences.annotation.Title;
 import eugene.utils.EncodingUtils;
 import eugene.utils.FolderFilteringUtils;
 
@@ -19,8 +21,8 @@ public enum Config {
 	INSTANCE;
 
 	private int gestureStrokeMinPixelThreshold = 10;
-	// TODO make non-transient
-	private transient ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl(
+	@Hide
+	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl(
 			"Unrecognized Gesture");
 	/**
 	 * Dim screen in compact mode. Includes software buttons and navigation
@@ -30,6 +32,7 @@ public enum Config {
 	private boolean shoutBoxDrawSongInfoWhenIdle = true;
 	/** This may require restart */
 	private boolean hideActionBarOnPlaybackScreen = true; // default false
+	@Title("TEST TITLE")
 	private boolean hideNotificationBarInCompactMode = false;  // default false
 	/**
 	 * 0 to 1 (percentage of total height)
@@ -38,6 +41,7 @@ public enum Config {
 
 	private boolean treatAlbumAsPartOfSongInfo = false;
 
+	@Hide
 	private float defaultCoverLeftOffset = 36f / 400f;
 
 	private boolean librarySwapArrowAndMainBodyAction = true;
@@ -58,7 +62,9 @@ public enum Config {
 	private transient String folderFilterSQLPart = null;
 	private boolean sortByFilename = true;
 
+	@Hide
 	private int folderLimiterViewVerticalPadding = 17; // default = 2
+	@Hide
 	private int folderLimiterViewHorizontalPadding = 8; // default = 5
 	private boolean folderLimiterDisplayX = false;
 

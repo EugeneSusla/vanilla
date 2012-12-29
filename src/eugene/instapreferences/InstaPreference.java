@@ -3,20 +3,19 @@ package eugene.instapreferences;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import eugene.instapreferences.builder.RootPreferenceBuilder;
-
 import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.util.Log;
+import eugene.instapreferences.annotation.Hide;
+import eugene.instapreferences.builder.RootPreferenceBuilder;
 
 public class InstaPreference {
 
 	private RootPreferenceBuilder rootPreferenceBuilder = new RootPreferenceBuilder();
 
-	public void addToPreferenceActivity(PreferenceFragment preferenceFragment,
+	public void addToPreferenceFragment(PreferenceFragment preferenceFragment,
 			Object defaultConfigBean) {
 		PreferenceScreen preferenceScreen = getFromBean(preferenceFragment, defaultConfigBean);
 		preferenceScreen.setKey("key");
@@ -59,11 +58,11 @@ public class InstaPreference {
 	private void populatePreferenceScreen(PreferenceScreen preferenceScreen,
 			Context context, Object defaultConfigBean) {
 		for (Field field : defaultConfigBean.getClass().getDeclaredFields()) {
+			field.setAccessible(true);
 			int fieldModifiers = field.getModifiers();
-			if (Modifier.isTransient(fieldModifiers) || Modifier.isStatic(fieldModifiers)) {
+			if (Modifier.isTransient(fieldModifiers) || Modifier.isStatic(fieldModifiers) || field.getAnnotation(Hide.class) != null) {
 				continue;
 			}
-			field.setAccessible(true);
 			Preference preference = createPreferenceFromField(context, field,
 					defaultConfigBean);
 			preferenceScreen.addPreference(preference);

@@ -13,17 +13,10 @@ public class TextPreferenceBuilder implements PreferenceBuilder<String> {
 
 	@Override
 	public Preference build(Context context, String defaultValue, Field field) {
-		// Edit text preference
-        EditTextPreference editTextPref = new EditTextPreference(context);
-        
-        String preferenceName = InstaPreferenceUtils.getPreferenceNameFromFieldName(field);
-        
-        editTextPref.setDialogTitle(preferenceName);
-        editTextPref.setKey(InstaPreferenceUtils.getSettingsNameFromFieldName(field.getName()));
-        editTextPref.setTitle(preferenceName);
-        editTextPref.setText(defaultValue);
-//        editTextPref.setSummary(preferenceName);	//TODO Summary annotation
-        return editTextPref;
+        EditTextPreference preference = new EditTextPreference(context);
+        InstaPreferenceUtils.fillPreferenceEssentials(field, preference);
+        preference.setText(defaultValue);
+        return preference;
 	}
 
 	

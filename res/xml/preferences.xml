@@ -52,6 +52,12 @@ THE SOFTWARE.
 			android:targetClass="ch.blinkenlights.android.vanilla.PreferencesActivity$ShakeActivity" />
 	</PreferenceScreen>
 	<PreferenceScreen
+		android:title="@string/gesture_player_settings">
+		<intent
+			android:targetPackage="ch.blinkenlights.android.vanilla"
+			android:targetClass="ch.blinkenlights.android.vanilla.PreferencesActivity$GesturePlayerActivity" />
+	</PreferenceScreen>
+	<PreferenceScreen
 		android:title="@string/misc_features">
 		<intent
 			android:targetPackage="ch.blinkenlights.android.vanilla"

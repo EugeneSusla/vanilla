@@ -2,6 +2,8 @@ package eugene.instapreferences;
 
 import java.lang.reflect.Field;
 
+import android.preference.DialogPreference;
+import android.preference.Preference;
 import eugene.utils.StringUtils;
 
 public class InstaPreferenceUtils {
@@ -16,5 +18,18 @@ public class InstaPreferenceUtils {
 
 	public static String getSettingsNameFromFieldName(String fieldName) {
 		return StringUtils.camelCaseToUnderscoreLowerCase(fieldName);
+	}
+	
+	public static void fillPreferenceEssentials(Field field, Preference preference) {
+		String preferenceName = getPreferenceNameFromFieldName(field);
+        
+        preference.setKey(getSettingsNameFromFieldName(field.getName()));
+        preference.setTitle(preferenceName);
+        
+        preference.setOnPreferenceChangeListener(SetterInvokeOnPreferenceChangeListener)
+        
+        if (preference instanceof DialogPreference) {
+        	((DialogPreference)preference).setDialogTitle(preferenceName);
+        }
 	}
 }

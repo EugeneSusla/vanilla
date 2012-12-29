@@ -1,9 +1,9 @@
 package eugene.config;
 
+import android.content.SharedPreferences;
 import ch.blinkenlights.android.vanilla.Action;
 import ch.blinkenlights.android.vanilla.PlaybackService;
-import ch.blinkenlights.android.vanilla.preference.PrefKeys;
-import android.content.SharedPreferences;
+import ch.blinkenlights.android.vanilla.PrefKeys;
 import eugene.gestures.BasicGesture;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.ActionManager;

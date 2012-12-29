@@ -15,14 +15,10 @@ public abstract class TwoStatePreferenceBuilder implements PreferenceBuilder<Boo
 		// Edit text preference
 		TwoStatePreference preference = createPreference(context);
         
-        String preferenceName = InstaPreferenceUtils.getPreferenceNameFromFieldName(field);
-        
-        preference.setKey(InstaPreferenceUtils.getSettingsNameFromFieldName(field.getName()));
-        preference.setTitle(preferenceName);
+		InstaPreferenceUtils.fillPreferenceEssentials(field, preference);
         preference.setChecked(Boolean.TRUE.equals(defaultValue));
-//        editTextPref.setSummary(preferenceName);	//TODO Summary annotation
         return preference;
 	}
-	
+
 	protected abstract TwoStatePreference createPreference(Context context);
 }
