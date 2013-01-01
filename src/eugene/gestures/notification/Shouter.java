@@ -1,6 +1,7 @@
 package eugene.gestures.notification;
 
 import android.util.Log;
+import eugene.config.Config;
 import eugene.ioc.ComponentResolver;
 
 public class Shouter {
@@ -23,5 +24,10 @@ public class Shouter {
 	public static void shout(DrawableNotification drawableNotification) {
 		logMessage(drawableNotification.asText());
 		ComponentResolver.getFullPlaybackActivity().getShoutBoxView().displayNotification(drawableNotification);
+	}
+	
+	public static void clear() {
+		shout(BlankNotification.INSTANCE);
+		ComponentResolver.getFullPlaybackActivity().showAlbumName();
 	}
 }

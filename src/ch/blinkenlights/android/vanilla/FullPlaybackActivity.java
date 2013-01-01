@@ -309,11 +309,11 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		if (mTitle != null) {
 			if (song == null) {
 				mTitle.setText(null);
-				// mAlbum.setText(null);
+				mAlbum.setText(null);
 				mArtist.setText(null);
 			} else {
 				mTitle.setText(song.title);
-				// mAlbum.setText(song.album);
+				mAlbum.setText(song.album);
 				mArtist.setText(song.artist);
 			}
 			updateQueuePosition();
@@ -731,5 +731,9 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 
 	public Song getCurrentSong() {
 		return mCurrentSong;
+	}
+	
+	public void showAlbumName() {
+		mAlbum.setText(mCurrentSong.album);
 	}
 }

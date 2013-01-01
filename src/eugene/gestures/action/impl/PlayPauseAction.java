@@ -15,7 +15,8 @@ public class PlayPauseAction extends VanillaAction {
 	@Override
 	public ShoutNotification invoke() {
 		super.invoke();
-		return CurrentSongNotification.INSTANCE;
+//		return CurrentSongNotification.INSTANCE;
+		return null;
 	}
 	
 	@Override

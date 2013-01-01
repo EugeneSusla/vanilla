@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ch.blinkenlights.android.vanilla.MediaUtils;
-
 import android.content.pm.ActivityInfo;
-import android.database.DatabaseUtils;
+import ch.blinkenlights.android.vanilla.MediaUtils;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.ShoutNotificationImpl;
 import eugene.instapreferences.annotation.Hide;
@@ -30,6 +28,8 @@ public enum Config {
 	 */
 	private boolean useLowProfileInCompactMode = true;	//default false
 	private boolean shoutBoxDrawSongInfoWhenIdle = true;
+	private boolean shoutBoxClearNotifications = true;
+	private int shoutBoxNotificationsDisplayTime = 2000;
 	/** This may require restart */
 	private boolean hideActionBarOnPlaybackScreen = true; // default false
 	@Title("TEST TITLE")
@@ -256,5 +256,21 @@ public enum Config {
 
 	public void setHideNotificationBarInCompactMode(boolean hideNotificationBarInCompactMode) {
 		this.hideNotificationBarInCompactMode = hideNotificationBarInCompactMode;
+	}
+
+	public boolean isShoutBoxClearNotifications() {
+		return shoutBoxClearNotifications;
+	}
+
+	public void setShoutBoxClearNotifications(boolean shoutBoxClearNotifications) {
+		this.shoutBoxClearNotifications = shoutBoxClearNotifications;
+	}
+
+	public int getShoutBoxNotificationsDisplayTime() {
+		return shoutBoxNotificationsDisplayTime;
+	}
+
+	public void setShoutBoxNotificationsDisplayTime(int shoutBoxNotificationsDisplayTime) {
+		this.shoutBoxNotificationsDisplayTime = shoutBoxNotificationsDisplayTime;
 	}
 }

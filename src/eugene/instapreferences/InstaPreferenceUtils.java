@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import android.preference.DialogPreference;
 import android.preference.Preference;
+import eugene.instapreferences.listener.SetterInvokeOnPreferenceChangeListener;
 import eugene.utils.StringUtils;
 
 public class InstaPreferenceUtils {
@@ -26,7 +27,7 @@ public class InstaPreferenceUtils {
         preference.setKey(getSettingsNameFromFieldName(field.getName()));
         preference.setTitle(preferenceName);
         
-        preference.setOnPreferenceChangeListener(SetterInvokeOnPreferenceChangeListener)
+        preference.setOnPreferenceChangeListener(SetterInvokeOnPreferenceChangeListener.INSTANCE);
         
         if (preference instanceof DialogPreference) {
         	((DialogPreference)preference).setDialogTitle(preferenceName);
