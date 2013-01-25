@@ -277,7 +277,7 @@ public final class CoverView extends View implements Handler.Callback {
 			mStartY = y;
 			mLastMotionX = x;
 			mLastMotionY = y;
-			mScrolling = true;
+//			mScrolling = true;
 
 			mCurrentGesture = new BasicGesture();
 
