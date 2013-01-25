@@ -591,7 +591,6 @@ public final class CoverView extends View implements Handler.Callback {
 	}
 
 	public void setCurrentGesture(BasicGesture newGesture) {
-		Log.d("CoverView", "setCurrentGesture " + newGesture);
 		if (mCurrentGesture == null || !mCurrentGesture.equals(newGesture)) {
 			this.mCurrentGesture = newGesture;
 			onMidwayGesture(mCurrentGesture);

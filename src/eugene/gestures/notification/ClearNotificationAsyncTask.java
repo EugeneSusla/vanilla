@@ -8,20 +8,17 @@ public class ClearNotificationAsyncTask extends AsyncTask<Void, Void, Void> {
 
 	@Override
 	protected synchronized Void doInBackground(Void... params) {
-		Log.d("ClearNotificationAsyncTask", "started background task");
 		try {
 			wait(Config.INSTANCE.getShoutBoxNotificationsDisplayTime());
 		} catch (InterruptedException e) {
-			Log.d("ClearNotificationAsyncTask", "task cancelled while in progress");
+			//task cancelled while in progress. no action needed
 		}
-		Log.d("ClearNotificationAsyncTask", "finished background task");
 		return null;
 	}
 
 	@Override
 	protected void onPostExecute(Void result) {
 		super.onPostExecute(result);
-		Log.d("ClearNotificationAsyncTask", "post execute");
 		Shouter.clear();
 	}
 }
