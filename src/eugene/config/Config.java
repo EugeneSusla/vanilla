@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.content.pm.ActivityInfo;
 import ch.blinkenlights.android.vanilla.MediaUtils;
+import eugene.config.enumerations.QueueSecondaryInfoFormat;
 import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.ShoutNotificationImpl;
 import eugene.instapreferences.annotation.Hide;
@@ -72,6 +73,9 @@ public enum Config {
 	// Effectively enum: ActivityInfo.SCREEN_ORIENTATION_*
 	private transient int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT; // default
 																						// ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+	
+	@Hide
+	private QueueSecondaryInfoFormat queueSecondaryInfoFormat = QueueSecondaryInfoFormat.ARTIST; 
 
 	/*-------------------------------------------------------------------*/
 
@@ -272,5 +276,13 @@ public enum Config {
 
 	public void setShoutBoxNotificationsDisplayTime(int shoutBoxNotificationsDisplayTime) {
 		this.shoutBoxNotificationsDisplayTime = shoutBoxNotificationsDisplayTime;
+	}
+
+	public QueueSecondaryInfoFormat getQueueSecondaryInfoFormat() {
+		return queueSecondaryInfoFormat;
+	}
+
+	public void setQueueSecondaryInfoFormat(QueueSecondaryInfoFormat queueSecondaryInfoFormat) {
+		this.queueSecondaryInfoFormat = queueSecondaryInfoFormat;
 	}
 }

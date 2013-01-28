@@ -22,6 +22,7 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import eugene.config.Config;
 import android.content.Context;
 import android.app.Activity;
 import android.view.View;
@@ -66,7 +67,7 @@ public class ShowQueueAdapter extends ArrayAdapter<Song> {
 		TextView target = ((TextView)row.findViewById(R.id.text));
 		SpannableStringBuilder sb = new SpannableStringBuilder(song.title);
 		sb.append('\n');
-		sb.append(song.album);
+		Config.INSTANCE.getQueueSecondaryInfoFormat().append(sb, song);
 		sb.setSpan(new ForegroundColorSpan(Color.GRAY), song.title.length() + 1, sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		
 		target.setText(sb);
