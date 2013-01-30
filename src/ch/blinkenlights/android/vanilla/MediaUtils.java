@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import junit.framework.Assert;
 import android.content.ContentResolver;
@@ -537,7 +538,7 @@ public class MediaUtils {
 		// It would be better to use selectionArgs to pass path here, but there
 		// doesn't appear to be any way to pass the * when using it.
 		StringBuilder selection = new StringBuilder("_data GLOB ");
-		DatabaseUtils.appendEscapedSQLString(selection, path);
+		DatabaseUtils.appendEscapedSQLString(selection, escapeRegexSpecialCharacters(path));
 		 // delete the quotation mark added by the escape method
 		selection.deleteCharAt(selection.length() - 1);
 		selection.append("*' AND is_music!=0");
@@ -547,6 +548,15 @@ public class MediaUtils {
 		QueryTask result = new QueryTask(media, projection, selection.toString(), null, DEFAULT_SORT);
 		result.type = TYPE_FILE;
 		return result;
+	}
+	
+	public static String escapeRegexSpecialCharacters(String s) {
+		//Normal '\' escaping doesn't work
+		//return s.replace("[", "\\[").replace("]", "\\]").replace("?", "\\?").replace("*", "\\*");
+		
+		// Uses a [[]X[]] glob trick
+		// http://edgylogic.com/blog/escaping-square-brackets-pythons-glob/
+		return s.replace("[", "[[]").replaceAll("(?<!\\[)\\]", "[]]");
 	}
 	
 	public static String appendFolderFilter(String selection) {

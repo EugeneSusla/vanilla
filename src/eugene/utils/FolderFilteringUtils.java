@@ -2,6 +2,9 @@ package eugene.utils;
 
 import java.io.File;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import ch.blinkenlights.android.vanilla.MediaUtils;
 
 import eugene.config.Config;
 
@@ -68,7 +71,7 @@ public class FolderFilteringUtils {
 		query.append("(");
 		for (String term : folderList) {
 			query.append("_data " + mainOperand + " ");
-			DatabaseUtils.appendEscapedSQLString(query, term + "*");
+			DatabaseUtils.appendEscapedSQLString(query, MediaUtils.escapeRegexSpecialCharacters(term) + "*");
 			query.append(operandBetweenWithSpaces);
 		}
 		int queryLength = query.length();
