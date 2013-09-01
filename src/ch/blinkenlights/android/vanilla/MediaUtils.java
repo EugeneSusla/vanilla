@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 import junit.framework.Assert;
 import android.content.ContentResolver;
@@ -35,6 +34,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import eugene.config.Config;
 
 /**
@@ -571,5 +571,6 @@ public class MediaUtils {
 			selection.append(" AND ");
 		}
 		selection.append(folderFilterSQLPart);
+		Log.d("MediaUtils", selection.toString());
 	}
 }

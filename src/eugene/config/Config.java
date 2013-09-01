@@ -56,10 +56,10 @@ public enum Config {
 
 	// TODO make non-transient
 	private transient List<String> includeFolders = new ArrayList<String>(Arrays.asList(
-			"/storage/sdcard0/_Autosync/Audio", "/storage/sdcard0/Music"));
+			"/storage/emulated/0/_Autosync/Audio", "/storage/emulated/0/Music"));
 	// TODO make non-transient
 	private transient List<String> excludeFolders = new ArrayList<String>(
-			Arrays.asList("/storage/sdcard0/Music/_Books"));
+			Arrays.asList("/storage/emulated/0/Music/_Books"));
 	private transient String folderFilterSQLPart = null;
 	private boolean sortByFilename = true;
 
