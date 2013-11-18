@@ -2,7 +2,7 @@ package eugene.gestures.action;
 
 import eugene.utils.StringUtils;
 
-public abstract class ClassNameDisplayNameAction implements Action {
+public abstract class StatelessAction implements Action {
 
 	@Override
 	public String getDisplayName() {

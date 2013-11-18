@@ -68,6 +68,8 @@ public enum Config {
 	@Hide
 	private int folderLimiterViewHorizontalPadding = 8; // default = 5
 	private boolean folderLimiterDisplayX = false;
+	
+	private int maximumStrokesInGesture = 4; // default = 5
 
 	// TODO make non-transient
 	// Effectively enum: ActivityInfo.SCREEN_ORIENTATION_*
@@ -284,5 +286,13 @@ public enum Config {
 
 	public void setQueueSecondaryInfoFormat(QueueSecondaryInfoFormat queueSecondaryInfoFormat) {
 		this.queueSecondaryInfoFormat = queueSecondaryInfoFormat;
+	}
+
+	public int getMaximumStrokesInGesture() {
+		return maximumStrokesInGesture;
+	}
+
+	public void setMaximumStrokesInGesture(int maximumStrokesInGesture) {
+		this.maximumStrokesInGesture = maximumStrokesInGesture;
 	}
 }

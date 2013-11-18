@@ -37,8 +37,8 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
-import eugene.gestures.BasicGesture;
-import eugene.gestures.StrokeUtils;
+import eugene.gestures.Gesture;
+import eugene.gestures.Stroke;
 
 /**
  * Displays a flingable/draggable View of cover art/song info images generated
@@ -83,12 +83,12 @@ public final class CoverView extends View implements Handler.Callback {
 		/**
 		 * Called when the user has swiped a gesture on the view.
 		 */
-		public void gesture(BasicGesture gesture);
+		public void gesture(Gesture gesture);
 		
 		/**
 		 * Called when the swiped gesture is changed.
 		 */
-		public void midwayGesture(BasicGesture gesture);
+		public void midwayGesture(Gesture gesture);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public final class CoverView extends View implements Handler.Callback {
 	/**
 	 * The current gesture that is performed
 	 */
-	private BasicGesture mCurrentGesture;
+	private Gesture mCurrentGesture;
 	/**
 	 * Next/previous track scroll duration
 	 */
@@ -279,7 +279,7 @@ public final class CoverView extends View implements Handler.Callback {
 			mLastMotionY = y;
 //			mScrolling = true;
 
-			mCurrentGesture = new BasicGesture();
+			mCurrentGesture = new Gesture();
 
 			mUiHandler.sendEmptyMessageDelayed(MSG_LONG_CLICK,
 					ViewConfiguration.getLongPressTimeout());
@@ -288,7 +288,7 @@ public final class CoverView extends View implements Handler.Callback {
 			float deltaX = mLastMotionX - x;
 			float deltaY = mLastMotionY - y;
 
-			if (mCurrentGesture.addStroke(StrokeUtils.getStrokeFromDeltas(
+			if (mCurrentGesture.addStroke(Stroke.fromDeltas(
 					deltaX, deltaY))) {
 //				Shouter.shout(mCurrentGesture.toString());
 				onMidwayGesture(mCurrentGesture);
@@ -401,7 +401,7 @@ public final class CoverView extends View implements Handler.Callback {
 		}
 	}
 
-	private void onGesture(BasicGesture gesture) {
+	private void onGesture(Gesture gesture) {
 		// if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
 		// onSideSwipe(1);
 		// return;
@@ -413,7 +413,7 @@ public final class CoverView extends View implements Handler.Callback {
 		mCallback.gesture(gesture);
 	}
 	
-	private void onMidwayGesture(BasicGesture gesture) {
+	private void onMidwayGesture(Gesture gesture) {
 		// if (gesture.equals(BasicGesture.valueOf(Stroke.LEFT))) {
 		// onSideSwipe(1);
 		// return;
@@ -586,11 +586,11 @@ public final class CoverView extends View implements Handler.Callback {
 		}
 	}
 
-	public BasicGesture getCurrentGesture() {
+	public Gesture getCurrentGesture() {
 		return mCurrentGesture;
 	}
 
-	public void setCurrentGesture(BasicGesture newGesture) {
+	public void setCurrentGesture(Gesture newGesture) {
 		if (mCurrentGesture == null || !mCurrentGesture.equals(newGesture)) {
 			this.mCurrentGesture = newGesture;
 			onMidwayGesture(mCurrentGesture);

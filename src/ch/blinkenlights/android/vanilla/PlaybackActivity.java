@@ -24,7 +24,7 @@ package ch.blinkenlights.android.vanilla;
 
 import eugene.config.Config;
 import eugene.config.GestureMappingConfig;
-import eugene.gestures.BasicGesture;
+import eugene.gestures.Gesture;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.ActionManager;
 import eugene.gestures.action.VanillaAction;
@@ -383,7 +383,7 @@ public abstract class PlaybackActivity extends Activity implements
 	}
 
 	@Override
-	public void gesture(BasicGesture gesture) {
+	public void gesture(Gesture gesture) {
 //		if (gesture.equals(BasicGesture.valueOf(Stroke.UP))) {
 //			upSwipe();
 //		} else if (gesture.equals(BasicGesture.valueOf(Stroke.DOWN))) {
@@ -396,7 +396,7 @@ public abstract class PlaybackActivity extends Activity implements
 	}
 	
 	@Override
-	public void midwayGesture(BasicGesture gesture) {
+	public void midwayGesture(Gesture gesture) {
 		mGestureListener.onMidwayGesture(gesture);
 	}
 	

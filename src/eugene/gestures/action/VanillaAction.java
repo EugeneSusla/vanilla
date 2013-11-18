@@ -8,6 +8,14 @@ public class VanillaAction implements eugene.gestures.action.Action {
 	
 	private ch.blinkenlights.android.vanilla.Action vanillaAction;
 	
+	public static String getSettingsName(ch.blinkenlights.android.vanilla.Action action) {
+		return "vanillaAction://" + action.name();
+	}
+	
+	public static String getDisplayName(ch.blinkenlights.android.vanilla.Action action) {
+		return StringUtils.camelCaseToPlainString(action.name());
+	}
+	
 	public VanillaAction(ch.blinkenlights.android.vanilla.Action action) {
 		super();
 		this.vanillaAction = action;
@@ -21,11 +29,11 @@ public class VanillaAction implements eugene.gestures.action.Action {
 
 	@Override
 	public String getDisplayName() {
-		return StringUtils.camelCaseToPlainString(vanillaAction.name());
+		return getDisplayName(vanillaAction);
 	}
 	
 	@Override
 	public String getSettingsName() {
-		return "vanillaAction://" + vanillaAction.name();
+		return getSettingsName(vanillaAction);
 	}
 }

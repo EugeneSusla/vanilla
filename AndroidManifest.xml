@@ -150,7 +150,7 @@ THE SOFTWARE.
 		<activity android:name="PreferencesActivity$MiscActivity" />
 		<activity android:name="PreferencesActivity$AboutActivity" />
 		<activity
-			android:name=".TabOrderActivity"
+			android:name=".PickActionActivity"
 			android:theme="@style/BackActionBar" />
 	</application>
 </manifest>

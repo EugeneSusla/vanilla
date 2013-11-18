@@ -23,10 +23,11 @@
 
 package ch.blinkenlights.android.vanilla;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
-import eugene.config.Config;
-import eugene.instapreferences.InstaPreference;
+import java.util.Map;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -34,19 +35,24 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
+import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewFragment;
+import eugene.config.Config;
+import eugene.gestures.Gesture;
+import eugene.gestures.action.ActionManager;
+import eugene.instapreferences.InstaPreference;
 
 /**
  * The preferences activity in which one can change application preferences.
  */
 public class PreferencesActivity extends PreferenceActivity {
 	private static InstaPreference instaPreference = new InstaPreference();
-	
+
 	/**
 	 * Initialize the activity, loading the preference specifications.
 	 */
@@ -171,10 +177,64 @@ public class PreferencesActivity extends PreferenceActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			instaPreference.addToPreferenceFragment(this, Config.INSTANCE);
+			// instaPreference.addToPreferenceFragment(this, Config.INSTANCE`);
+			PreferenceScreen preferenceScreen = getPreferenceManager()
+					.createPreferenceScreen(getActivity());
+			// TODO remove
+			preferenceScreen.setKey("key");
+			preferenceScreen.setTitle("PREFERENCE SCREEN TITLE");
+			preferenceScreen.setSummary("PREFERENCE SCREEN SUMMARY");
+
+			List<String> keys = new ArrayList<String>(Arrays.asList("s", "ss"));
+			List<String> strokes = new ArrayList<String>(Arrays.asList("u", "d", "l", "r"));
+			fillGestureSettingKeys("", Config.INSTANCE.getMaximumStrokesInGesture(), keys, strokes);
+			List<Gesture> gestures = new ArrayList<Gesture>();
+			for (String key : keys) {
+				gestures.add(Gesture.valueOf(key));
+			}
+			Collections.sort(gestures);
+			for (Gesture gesture : gestures) {
+				ListPreferenceSummary preference = new ListPreferenceSummary(
+						getActivity(), null);
+				preference.setDefaultValue(eugene.gestures.action.Action.NO_OP
+						.getSettingsName());
+				preference.setKey("gesture_" + gesture.toSettingsString());
+				preference.setTitle(gesture.toString());
+				// TODO remove these resources
+				// CharSequence[] vanillaActionEntries =
+				// getResources().getTextArray(R.array.swipe_action_entries);
+				// CharSequence[] vanillaActionValues =
+				// getResources().getTextArray(R.array.swipe_action_values);
+				Map<String, String> knownActions = ActionManager.INSTANCE
+						.getKnownActions();
+				String[] values = knownActions.keySet().toArray(
+						new String[knownActions.size()]);
+				String[] entries = knownActions.values().toArray(
+						new String[knownActions.size()]);
+				preference.setEntryValues(values);
+				preference.setEntries(entries);
+				preferenceScreen.addPreference(preference);
+			}
+
+			setPreferenceScreen(preferenceScreen);
 		}
 	}
 	
+	private static void fillGestureSettingKeys(String startingFrom, int maxLength, List<String> result, List<String> directions) {
+		if (!startingFrom.isEmpty()) {
+			result.add(startingFrom);
+		}
+		if (startingFrom.length() >= maxLength) {
+			return;
+		}
+		for (String direction : directions) {
+			if (startingFrom.endsWith(direction)) {
+				continue;
+			}
+			fillGestureSettingKeys(startingFrom + direction, maxLength, result, directions);
+		}
+	}
+
 	public static class MiscActivity extends PreferenceActivity {
 		@SuppressWarnings("deprecation")
 		@Override
@@ -209,7 +269,8 @@ public class PreferencesActivity extends PreferenceActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			WebView view = (WebView) super.onCreateView(inflater, container, savedInstanceState);
+			WebView view = (WebView) super.onCreateView(inflater, container,
+					savedInstanceState);
 			view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 			view.getSettings().setJavaScriptEnabled(true);
 			view.loadUrl("file:///android_asset/about.html");

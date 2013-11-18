@@ -44,7 +44,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import eugene.config.Config;
-import eugene.gestures.BasicGesture;
+import eugene.gestures.Gesture;
 import eugene.gestures.action.ActionManager;
 import eugene.gestures.action.impl.ShowQueueAction;
 import eugene.gestures.notification.Shouter;
@@ -712,7 +712,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 	public boolean onLongClick(View view) {
 		switch (view.getId()) {
 		case R.id.cover_view:
-			mCoverView.setCurrentGesture(BasicGesture.LONG_TAP.clone());
+			mCoverView.setCurrentGesture(Gesture.LONG_TAP.clone());
 			break;
 		case R.id.info_table:
 			setExtraInfoVisible(!mExtraInfoVisible);
