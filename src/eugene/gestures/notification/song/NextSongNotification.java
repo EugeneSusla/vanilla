@@ -7,10 +7,6 @@ public class NextSongNotification extends AbstractSongInfoNotification {
 
 	public static final NextSongNotification INSTANCE = new NextSongNotification();
 	
-	private NextSongNotification() {
-		super();
-	}
-	
 	@Override
 	public Song getSong() {
 		return ComponentResolver.getPlaybackService().getSong(1);

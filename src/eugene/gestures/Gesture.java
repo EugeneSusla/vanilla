@@ -3,42 +3,22 @@ package eugene.gestures;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Gesture implements Cloneable, Comparable<Gesture> {
-	public static final Gesture TAP = new Gesture(
-			Collections.unmodifiableList(Arrays.asList(Stroke.STATIC)));
-	public static final Gesture LONG_TAP = new Gesture(
-			Collections.unmodifiableList(Arrays.asList(Stroke.STATIC,
-					Stroke.STATIC)));
+import ch.blinkenlights.android.vanilla.PrefKeys;
 
+public class Gesture extends ActionableEvent {
 	private static ConcurrentHashMap<Stroke, Gesture> mCache = new ConcurrentHashMap<Stroke, Gesture>();
 
-	private List<Stroke> gestureStrokes = new ArrayList<Stroke>(
+	protected List<Stroke> gestureStrokes = new ArrayList<Stroke>(
 			Collections.singletonList(Stroke.STATIC));
-	private transient String toStringValue; // caches it's text representation
-	private transient String toSettingsStringValue; // caches it's text
-													// representation
-
-	public Gesture() {
-	}
 
 	public Gesture(List<Stroke> gestureStrokes) {
+		super(null, null);
 		this.gestureStrokes = new ArrayList<Stroke>(gestureStrokes);
-	}
-
-	public boolean addStroke(Stroke stroke) {
-		if (gestureStrokes.isEmpty()
-				|| (stroke != gestureStrokes.get(gestureStrokes.size() - 1) && stroke != Stroke.STATIC)) {
-			if ((gestureStrokes.size() == 1 && gestureStrokes.get(0) == Stroke.STATIC)
-					|| (gestureStrokes.size() == 2 && gestureStrokes.get(1) == Stroke.STATIC)) {
-				gestureStrokes.clear();
-			}
-			gestureStrokes.add(stroke);
-			return true;
-		}
-		return false;
 	}
 
 	public static Gesture valueOf(String strokes) {
@@ -68,21 +48,16 @@ public class Gesture implements Cloneable, Comparable<Gesture> {
 	@Override
 	public String toString() {
 		if (toStringValue == null) {
-			if (this.equals(TAP)) {
-				toStringValue = "Tap";
-			} else if (this.equals(LONG_TAP)) {
-				toStringValue = "Long Tap";
-			} else {
-				StringBuilder result = new StringBuilder();
-				for (Stroke stroke : gestureStrokes) {
-					result.append(stroke);
-				}
-				toStringValue = result.toString();
+			StringBuilder result = new StringBuilder();
+			for (Stroke stroke : gestureStrokes) {
+				result.append(stroke);
 			}
+			toStringValue = result.toString();
 		}
 		return toStringValue;
 	}
 
+	@Override
 	public String toSettingsString() {
 		if (toSettingsStringValue == null) {
 			StringBuilder result = new StringBuilder();
@@ -93,7 +68,7 @@ public class Gesture implements Cloneable, Comparable<Gesture> {
 		}
 		return toSettingsStringValue;
 	}
-
+	
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof Gesture)) {
@@ -109,27 +84,24 @@ public class Gesture implements Cloneable, Comparable<Gesture> {
 	}
 
 	@Override
-	public Gesture clone() {
+	public ActionableEvent clone() {
 		return new Gesture(gestureStrokes);
 	}
-
+	
 	@Override
-	public int compareTo(Gesture o) {
-		if (gestureStrokes.contains(Stroke.STATIC)
-				&& !o.gestureStrokes.contains(Stroke.STATIC)) {
-			return -1;
-		}
-		if (!gestureStrokes.contains(Stroke.STATIC)
-				&& o.gestureStrokes.contains(Stroke.STATIC)) {
+	public int compareTo(ActionableEvent o) {
+		if (!(o instanceof Gesture)) {
 			return 1;
 		}
-		int sizeDiff = gestureStrokes.size() - o.gestureStrokes.size();
+		
+		Gesture g = (Gesture) o;
+		int sizeDiff = gestureStrokes.size() - g.gestureStrokes.size();
 		if (sizeDiff != 0) {
 			return sizeDiff;
 		}
 		for (int i = 0; i < gestureStrokes.size(); i++) {
 			int strokeDiff = gestureStrokes.get(i).compareTo(
-					o.gestureStrokes.get(i));
+					g.gestureStrokes.get(i));
 			if (strokeDiff != 0) {
 				return strokeDiff;
 			}

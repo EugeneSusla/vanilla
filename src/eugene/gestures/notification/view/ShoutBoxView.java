@@ -37,7 +37,7 @@ public class ShoutBoxView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (currentNotification != null) {
-			currentNotification.asDrawable().draw(canvas);
+			currentNotification.draw(canvas);
 		}
 	}
 

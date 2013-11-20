@@ -6,30 +6,27 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eugene.config.Config;
-import eugene.gestures.Gesture;
+import eugene.gestures.ActionableEvent;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.Action;
 import eugene.gestures.action.AssignmentAwareAction;
 import eugene.gestures.notification.ShoutNotification;
-import eugene.gestures.notification.ShoutNotificationImpl;
+import eugene.gestures.notification.MutableTextNotification;
 
 public class ActionMapGestureListener implements GestureListener {
 
-	private ConcurrentHashMap<Gesture, Action> actionMap = new ConcurrentHashMap<Gesture, Action>();
-	private ConcurrentHashMap<Gesture, Action> midwayGestureActionMap = new ConcurrentHashMap<Gesture, Action>();
-	private ShoutNotificationImpl midwayGestureNotification = new ShoutNotificationImpl(
+	private ConcurrentHashMap<ActionableEvent, Action> actionMap = new ConcurrentHashMap<ActionableEvent, Action>();
+	private ConcurrentHashMap<ActionableEvent, Action> midwayGestureActionMap = new ConcurrentHashMap<ActionableEvent, Action>();
+	private MutableTextNotification midwayGestureNotification = new MutableTextNotification(
 			"");
 
-	/**
-	 * @return whether the gesture was recognized
-	 */
 	@Override
-	public boolean onGesture(Gesture gesture) {
+	public boolean onGesture(ActionableEvent gesture) {
 		return invokeActionFromMap(gesture, actionMap);
 	}
 
-	private boolean invokeActionFromMap(Gesture gesture,
-			Map<Gesture, Action> actionMap) {
+	private boolean invokeActionFromMap(ActionableEvent gesture,
+			Map<ActionableEvent, Action> actionMap) {
 		Action action = actionMap.get(gesture);
 		if (action == null) {
 			return false;
@@ -41,18 +38,15 @@ public class ActionMapGestureListener implements GestureListener {
 		return true;
 	}
 
-	/**
-	 * @return whether the gesture was recognized
-	 */
 	@Override
-	public boolean onMidwayGesture(Gesture gesture) {
+	public boolean onMidwayGesture(ActionableEvent gesture) {
 		if (invokeActionFromMap(gesture, midwayGestureActionMap)) {
 			return true;
 		}
 
 		Action action = actionMap.get(gesture);
 		if (action != null) {
-			if (!gesture.equals(Gesture.valueOf(Stroke.STATIC))) {
+			if (!gesture.equals(ActionableEvent.TAP)) {
 				midwayGestureNotification.setMessage(action.getDisplayName());
 				midwayGestureNotification.displayNotification();
 			}
@@ -65,21 +59,21 @@ public class ActionMapGestureListener implements GestureListener {
 	}
 
 	@Override
-	public void registerActionOnGesture(Gesture gesture, Action action) {
-		Gesture oldGesture = registerGestureActionPairOnMap(gesture, action, actionMap);
+	public void registerActionOnGesture(ActionableEvent gesture, Action action) {
+		ActionableEvent oldGesture = registerGestureActionPairOnMap(gesture, action, actionMap);
 		if (action instanceof AssignmentAwareAction) {
 			((AssignmentAwareAction) action).onActionAssignment(gesture, oldGesture, this);
 		}
 	}
 
 	@Override
-	public void registerActionOnMidwayGesture(Gesture gesture,
+	public void registerActionOnMidwayGesture(ActionableEvent gesture,
 			Action action) {
 		registerGestureActionPairOnMap(gesture, action, midwayGestureActionMap);
 	}
 
-	public Gesture registerGestureActionPairOnMap(Gesture gesture,
-			Action action, Map<Gesture, Action> actionMap) {
+	public ActionableEvent registerGestureActionPairOnMap(ActionableEvent gesture,
+			Action action, Map<ActionableEvent, Action> actionMap) {
 		if (gesture == null) {
 			throw new IllegalArgumentException(
 					"Registering action for gesture null");
@@ -89,9 +83,9 @@ public class ActionMapGestureListener implements GestureListener {
 					"Registering a null action for gesture " + gesture);
 		}
 		
-		Gesture oldGesture = null;
+		ActionableEvent oldGesture = null;
 		if (actionMap == this.actionMap) {
-			for (Entry<Gesture, Action> entry : actionMap.entrySet()) {
+			for (Entry<ActionableEvent, Action> entry : actionMap.entrySet()) {
 				if (entry.getValue().equals(action)) {
 					oldGesture = entry.getKey();
 					break;
@@ -103,12 +97,12 @@ public class ActionMapGestureListener implements GestureListener {
 	}
 
 	@Override
-	public void unRegisterGesture(Gesture gesture) {
+	public void unRegisterGesture(ActionableEvent gesture) {
 		actionMap.remove(gesture);
 	}
 
 	@Override
-	public void unRegisterMidwayGesture(Gesture gesture) {
+	public void unRegisterMidwayGesture(ActionableEvent gesture) {
 		midwayGestureActionMap.remove(gesture);
 	}
 

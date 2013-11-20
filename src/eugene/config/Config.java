@@ -9,7 +9,7 @@ import android.content.pm.ActivityInfo;
 import ch.blinkenlights.android.vanilla.MediaUtils;
 import eugene.config.enumerations.QueueSecondaryInfoFormat;
 import eugene.gestures.notification.ShoutNotification;
-import eugene.gestures.notification.ShoutNotificationImpl;
+import eugene.gestures.notification.MutableTextNotification;
 import eugene.instapreferences.annotation.Hide;
 import eugene.instapreferences.annotation.Title;
 import eugene.utils.EncodingUtils;
@@ -21,7 +21,7 @@ public enum Config {
 
 	private int gestureStrokeMinPixelThreshold = 10;
 	@Hide
-	private ShoutNotification unrecognisedGestureNotification = new ShoutNotificationImpl(
+	private ShoutNotification unrecognisedGestureNotification = new MutableTextNotification(
 			"Unrecognized Gesture");
 	/**
 	 * Dim screen in compact mode. Includes software buttons and navigation

@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import eugene.config.Config;
+import eugene.preferences.SerializableToPreferences;
 
-public enum Stroke {
+public enum Stroke implements SerializableToPreferences {
 	STATIC("\u2022"),
 	UP("\u2191"),
 	DOWN("\u2193"),
@@ -14,8 +15,10 @@ public enum Stroke {
 	
 	Stroke(String toString) {
 		this.toString = toString;
+		settingsChar = Character.toLowerCase(name().charAt(0));
 	}
 	private String toString;
+	private char settingsChar;
 	
 	private static Map<Character, Stroke> charMap = new HashMap<Character, Stroke>();
 	
@@ -24,14 +27,15 @@ public enum Stroke {
 		return toString;
 	}
 	
+	@Override
 	public String toSettingsString() {
-		return Character.toString(Character.toLowerCase(name().charAt(0)));
+		return Character.toString(settingsChar);
 	}
-
+	
 	public static Stroke fromChar(char c) {
 		if (charMap.isEmpty()) {
 			for (Stroke s : values()) {
-				charMap.put(Character.toLowerCase(s.name().charAt(0)), s);
+				charMap.put(s.settingsChar, s);
 				charMap.put(Character.toLowerCase(s.toString.charAt(0)), s);
 			}
 		}

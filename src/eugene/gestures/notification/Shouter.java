@@ -10,13 +10,9 @@ public class Shouter {
 	
 	public static void shout(String message) {
 		ComponentResolver.getFullPlaybackActivity().shout(message);
-		shout(new DrawableTextNotification(message));
+		shout(new TextNotification(message));
 	}
 
-	public static void logMessage(String message) {
-		Log.i(Shouter.class.getSimpleName(), message);
-	}
-	
 	public static void shout(ShoutNotification shoutNotification) {
 		shout(shoutNotification.asText());
 	}
@@ -29,5 +25,9 @@ public class Shouter {
 	public static void clear() {
 		shout(BlankNotification.INSTANCE);
 		ComponentResolver.getFullPlaybackActivity().showAlbumName();
+	}
+	
+	private static void logMessage(String message) {
+		Log.i(Shouter.class.getSimpleName(), message);
 	}
 }

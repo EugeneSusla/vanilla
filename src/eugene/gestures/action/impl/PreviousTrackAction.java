@@ -1,6 +1,6 @@
 package eugene.gestures.action.impl;
 
-import eugene.gestures.Gesture;
+import eugene.gestures.ActionableEvent;
 import eugene.gestures.action.AssignmentAwareAction;
 import eugene.gestures.action.StatelessAction;
 import eugene.gestures.listener.GestureListener;
@@ -18,7 +18,7 @@ public class PreviousTrackAction extends StatelessAction implements
 	}
 
 	@Override
-	public void onActionAssignment(Gesture gesture, Gesture oldGesture,
+	public void onActionAssignment(ActionableEvent gesture, ActionableEvent oldGesture,
 			GestureListener gestureListener) {
 		if (oldGesture != null) {
 			gestureListener.unRegisterMidwayGesture(oldGesture);

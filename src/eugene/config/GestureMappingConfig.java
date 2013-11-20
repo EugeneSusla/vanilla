@@ -2,8 +2,8 @@ package eugene.config;
 
 import android.content.SharedPreferences;
 import ch.blinkenlights.android.vanilla.Action;
-import ch.blinkenlights.android.vanilla.PlaybackService;
 import ch.blinkenlights.android.vanilla.PrefKeys;
+import eugene.gestures.ActionableEvent;
 import eugene.gestures.Gesture;
 import eugene.gestures.Stroke;
 import eugene.gestures.action.ActionManager;
@@ -17,7 +17,7 @@ import eugene.ioc.ComponentResolver;
 public class GestureMappingConfig {
 
 	public static GestureListener getGestureListener() {
-		SharedPreferences prefs = PlaybackService.getSettings(ComponentResolver.getFullPlaybackActivity());
+		SharedPreferences prefs = ComponentResolver.getSharedPreferences();
 		Action upAction = Action.getAction(prefs, PrefKeys.SWIPE_UP_ACTION,
 				Action.Nothing);
 		Action downAction = Action.getAction(prefs, PrefKeys.SWIPE_DOWN_ACTION,
@@ -32,9 +32,9 @@ public class GestureMappingConfig {
 		gestureListener.registerActionOnGesture(Gesture.valueOf(Stroke.DOWN), ActionManager.INSTANCE.getVanillaAction(downAction));
 		gestureListener.registerActionOnGesture(Gesture.valueOf(Stroke.LEFT), ActionManager.INSTANCE.getActionInstance(NextTrackAction.class));
 		gestureListener.registerActionOnGesture(Gesture.valueOf(Stroke.RIGHT), ActionManager.INSTANCE.getActionInstance(PreviousTrackAction.class));
-		gestureListener.registerActionOnGesture(Gesture.TAP, ActionManager.INSTANCE.getVanillaAction(coverPressAction));
+		gestureListener.registerActionOnGesture(ActionableEvent.TAP, ActionManager.INSTANCE.getVanillaAction(coverPressAction));
 		//gestureListener.registerActionOnGesture(BasicGesture.LONG_TAP, ActionManager.INSTANCE.getVanillaAction(coverLongPressAction));
-		gestureListener.registerActionOnGesture(Gesture.LONG_TAP, ActionManager.INSTANCE.getActionInstance(ShowQueueAction.class));
+		gestureListener.registerActionOnGesture(ActionableEvent.LONG_TAP, ActionManager.INSTANCE.getActionInstance(ShowQueueAction.class));
 		return gestureListener;
 	}
 }

@@ -7,10 +7,6 @@ public class CurrentSongNotification extends AbstractSongInfoNotification {
 
 	public static final CurrentSongNotification INSTANCE = new CurrentSongNotification();
 
-	private CurrentSongNotification() {
-		super();
-	}
-
 	@Override
 	public Song getSong() {
 		return ComponentResolver.getFullPlaybackActivity().getCurrentSong();

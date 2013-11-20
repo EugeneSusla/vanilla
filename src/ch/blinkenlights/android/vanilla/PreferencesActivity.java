@@ -30,9 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
@@ -43,7 +45,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewFragment;
 import eugene.config.Config;
-import eugene.gestures.Gesture;
+import eugene.gestures.ActionableEvent;
 import eugene.gestures.action.ActionManager;
 import eugene.instapreferences.InstaPreference;
 
@@ -174,10 +176,14 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	public static class GesturePlayerFragment extends PreferenceFragment {
+		private static final String GESTURE_KEY_PREFIX = "gesture_";
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			// instaPreference.addToPreferenceFragment(this, Config.INSTANCE`);
+			SharedPreferences preferences = getPreferenceManager()
+					.getSharedPreferences();
 			PreferenceScreen preferenceScreen = getPreferenceManager()
 					.createPreferenceScreen(getActivity());
 			// TODO remove
@@ -185,42 +191,73 @@ public class PreferencesActivity extends PreferenceActivity {
 			preferenceScreen.setTitle("PREFERENCE SCREEN TITLE");
 			preferenceScreen.setSummary("PREFERENCE SCREEN SUMMARY");
 
-			List<String> keys = new ArrayList<String>(Arrays.asList("s", "ss"));
-			List<String> strokes = new ArrayList<String>(Arrays.asList("u", "d", "l", "r"));
-			fillGestureSettingKeys("", Config.INSTANCE.getMaximumStrokesInGesture(), keys, strokes);
-			List<Gesture> gestures = new ArrayList<Gesture>();
+			List<String> keys = new ArrayList<String>(Arrays.asList("s", "ss", "z"));
+			List<String> strokes = new ArrayList<String>(Arrays.asList("u",
+					"d", "l", "r"));
+			fillGestureSettingKeys("",
+					Config.INSTANCE.getMaximumStrokesInGesture(), keys, strokes);
+			List<ActionableEvent> bindedEvents = new ArrayList<ActionableEvent>();
+			List<ActionableEvent> unbindedEvents = new ArrayList<ActionableEvent>();
 			for (String key : keys) {
-				gestures.add(Gesture.valueOf(key));
+				String fullKey = GESTURE_KEY_PREFIX + key;
+				ActionableEvent event = ActionableEvent.fromSettingsString(key);
+				if (preferences.contains(fullKey)
+						&& !preferences.getString(fullKey, "").equals(
+								eugene.gestures.action.Action.NO_OP
+										.getSettingsName())) {
+					bindedEvents.add(event);
+				} else {
+					unbindedEvents.add(event);
+				}
 			}
-			Collections.sort(gestures);
-			for (Gesture gesture : gestures) {
-				ListPreferenceSummary preference = new ListPreferenceSummary(
-						getActivity(), null);
-				preference.setDefaultValue(eugene.gestures.action.Action.NO_OP
-						.getSettingsName());
-				preference.setKey("gesture_" + gesture.toSettingsString());
-				preference.setTitle(gesture.toString());
-				// TODO remove these resources
-				// CharSequence[] vanillaActionEntries =
-				// getResources().getTextArray(R.array.swipe_action_entries);
-				// CharSequence[] vanillaActionValues =
-				// getResources().getTextArray(R.array.swipe_action_values);
-				Map<String, String> knownActions = ActionManager.INSTANCE
-						.getKnownActions();
-				String[] values = knownActions.keySet().toArray(
-						new String[knownActions.size()]);
-				String[] entries = knownActions.values().toArray(
-						new String[knownActions.size()]);
-				preference.setEntryValues(values);
-				preference.setEntries(entries);
-				preferenceScreen.addPreference(preference);
-			}
+			Collections.sort(bindedEvents);
+			Collections.sort(unbindedEvents);
+			addGesturesCategory("In Use", bindedEvents, preferenceScreen);
+			addGesturesCategory("Unused", unbindedEvents, preferenceScreen);
 
 			setPreferenceScreen(preferenceScreen);
 		}
+
+		private void addGesturesCategory(String categoryTitle,
+				List<ActionableEvent> bindedGestures, PreferenceScreen preferenceScreen) {
+//			PreferenceGroup category = new PreferenceCategory(getActivity());
+			PreferenceGroup category = preferenceScreen;
+			category.setTitle(categoryTitle);
+			for (ActionableEvent gesture : bindedGestures) {
+				addGesturePreference(category, gesture);
+			}
+//			preferenceScreen.addPreference(category);
+		}
+
+		private void addGesturePreference(PreferenceGroup category,
+				ActionableEvent gesture) {
+			ListPreferenceSummary preference = new ListPreferenceSummary(
+					getActivity(), null);
+			preference.setDefaultValue(eugene.gestures.action.Action.NO_OP
+					.getSettingsName());
+			preference.setKey(GESTURE_KEY_PREFIX
+					+ gesture.toSettingsString());
+			preference.setTitle(gesture.toString());
+			// TODO remove these resources
+			// CharSequence[] vanillaActionEntries =
+			// getResources().getTextArray(R.array.swipe_action_entries);
+			// CharSequence[] vanillaActionValues =
+			// getResources().getTextArray(R.array.swipe_action_values);
+			Map<String, String> knownActions = ActionManager.INSTANCE
+					.getKnownActions();
+			String[] values = knownActions.keySet().toArray(
+					new String[knownActions.size()]);
+			String[] entries = knownActions.values().toArray(
+					new String[knownActions.size()]);
+			preference.setEntryValues(values);
+			preference.setEntries(entries);
+			category.addPreference(preference);
+//				preferenceScreen.addPreference(preference);
+		}
 	}
-	
-	private static void fillGestureSettingKeys(String startingFrom, int maxLength, List<String> result, List<String> directions) {
+
+	private static void fillGestureSettingKeys(String startingFrom,
+			int maxLength, List<String> result, List<String> directions) {
 		if (!startingFrom.isEmpty()) {
 			result.add(startingFrom);
 		}
@@ -231,7 +268,8 @@ public class PreferencesActivity extends PreferenceActivity {
 			if (startingFrom.endsWith(direction)) {
 				continue;
 			}
-			fillGestureSettingKeys(startingFrom + direction, maxLength, result, directions);
+			fillGestureSettingKeys(startingFrom + direction, maxLength, result,
+					directions);
 		}
 	}
 
