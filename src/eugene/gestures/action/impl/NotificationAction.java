@@ -22,7 +22,7 @@ public class NotificationAction implements Action {
 	}
 
 	@Override
-	public String getSettingsName() {
+	public String toSettingsString() {
 		throw new UnsupportedOperationException("This type of action cannot be written to settings");
 	}
 

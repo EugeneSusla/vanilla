@@ -33,7 +33,7 @@ public class VanillaAction implements eugene.gestures.action.Action {
 	}
 	
 	@Override
-	public String getSettingsName() {
+	public String toSettingsString() {
 		return getSettingsName(vanillaAction);
 	}
 }

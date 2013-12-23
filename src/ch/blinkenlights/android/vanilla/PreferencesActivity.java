@@ -176,8 +176,6 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	public static class GesturePlayerFragment extends PreferenceFragment {
-		private static final String GESTURE_KEY_PREFIX = "gesture_";
-
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -191,20 +189,14 @@ public class PreferencesActivity extends PreferenceActivity {
 			preferenceScreen.setTitle("PREFERENCE SCREEN TITLE");
 			preferenceScreen.setSummary("PREFERENCE SCREEN SUMMARY");
 
-			List<String> keys = new ArrayList<String>(Arrays.asList("s", "ss", "z"));
-			List<String> strokes = new ArrayList<String>(Arrays.asList("u",
-					"d", "l", "r"));
-			fillGestureSettingKeys("",
-					Config.INSTANCE.getMaximumStrokesInGesture(), keys, strokes);
 			List<ActionableEvent> bindedEvents = new ArrayList<ActionableEvent>();
 			List<ActionableEvent> unbindedEvents = new ArrayList<ActionableEvent>();
-			for (String key : keys) {
-				String fullKey = GESTURE_KEY_PREFIX + key;
+			for (String key : ActionableEvent.getAllSettingsKeys()) {
 				ActionableEvent event = ActionableEvent.fromSettingsString(key);
-				if (preferences.contains(fullKey)
-						&& !preferences.getString(fullKey, "").equals(
+				if (preferences.contains(key)
+						&& !preferences.getString(key, "").equals(
 								eugene.gestures.action.Action.NO_OP
-										.getSettingsName())) {
+										.toSettingsString())) {
 					bindedEvents.add(event);
 				} else {
 					unbindedEvents.add(event);
@@ -234,9 +226,8 @@ public class PreferencesActivity extends PreferenceActivity {
 			ListPreferenceSummary preference = new ListPreferenceSummary(
 					getActivity(), null);
 			preference.setDefaultValue(eugene.gestures.action.Action.NO_OP
-					.getSettingsName());
-			preference.setKey(GESTURE_KEY_PREFIX
-					+ gesture.toSettingsString());
+					.toSettingsString());
+			preference.setKey(gesture.toSettingsString());
 			preference.setTitle(gesture.toString());
 			// TODO remove these resources
 			// CharSequence[] vanillaActionEntries =
@@ -253,23 +244,6 @@ public class PreferencesActivity extends PreferenceActivity {
 			preference.setEntries(entries);
 			category.addPreference(preference);
 //				preferenceScreen.addPreference(preference);
-		}
-	}
-
-	private static void fillGestureSettingKeys(String startingFrom,
-			int maxLength, List<String> result, List<String> directions) {
-		if (!startingFrom.isEmpty()) {
-			result.add(startingFrom);
-		}
-		if (startingFrom.length() >= maxLength) {
-			return;
-		}
-		for (String direction : directions) {
-			if (startingFrom.endsWith(direction)) {
-				continue;
-			}
-			fillGestureSettingKeys(startingFrom + direction, maxLength, result,
-					directions);
 		}
 	}
 

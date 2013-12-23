@@ -104,7 +104,7 @@ public enum ActionManager {
 			}
 			for (Class<? extends Action> clazz : statelessActions) {
 				Action action = getActionInstance(clazz);
-				knownActions.put(action.getSettingsName(), action.getDisplayName());
+				knownActions.put(action.toSettingsString(), action.getDisplayName());
 			}
 		}
 		return knownActions;

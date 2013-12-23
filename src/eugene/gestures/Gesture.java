@@ -3,12 +3,8 @@ package eugene.gestures;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import ch.blinkenlights.android.vanilla.PrefKeys;
 
 public class Gesture extends ActionableEvent {
 	private static ConcurrentHashMap<Stroke, Gesture> mCache = new ConcurrentHashMap<Stroke, Gesture>();
@@ -66,7 +62,7 @@ public class Gesture extends ActionableEvent {
 			}
 			toSettingsStringValue = result.toString();
 		}
-		return toSettingsStringValue;
+		return SETTINGS_KEY_PREFIX + toSettingsStringValue;
 	}
 	
 	@Override
@@ -83,11 +79,6 @@ public class Gesture extends ActionableEvent {
 		return gestureStrokes.hashCode();
 	}
 
-	@Override
-	public ActionableEvent clone() {
-		return new Gesture(gestureStrokes);
-	}
-	
 	@Override
 	public int compareTo(ActionableEvent o) {
 		if (!(o instanceof Gesture)) {

@@ -17,7 +17,7 @@ public abstract class StatelessAction implements Action {
 	}
 	
 	@Override
-	public String getSettingsName() {
+	public String toSettingsString() {
 		return "class://" + getClass().getName();
 	}
 }
