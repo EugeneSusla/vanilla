@@ -97,6 +97,7 @@ public enum ActionManager {
 	public Map<String, String> getKnownActions() {
 		if (knownActions == null) {
 			knownActions = new LinkedHashMap<String, String>();
+            //TODO exclude vanilla next/previous
 			for (ch.blinkenlights.android.vanilla.Action vanillaAction : ch.blinkenlights.android.vanilla.Action
 					.values()) {
 				knownActions.put(VanillaAction.getSettingsName(vanillaAction),

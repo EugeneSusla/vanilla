@@ -292,7 +292,7 @@ public final class CoverView extends View implements Handler.Callback {
 			if (mCurrentGesture.addStroke(Stroke.fromDeltas(
 					deltaX, deltaY))) {
 //				Shouter.shout(mCurrentGesture.toString());
-				onMidwayGesture(mCurrentGesture);
+				onMidwayGesture(mCurrentGesture.canonicalize());
 			}
 
 			// if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -313,7 +313,7 @@ public final class CoverView extends View implements Handler.Callback {
 			int mvx = Math.abs(velocityX);
 			int mvy = Math.abs(velocityY);
 
-			onGesture(mCurrentGesture);
+			onGesture(mCurrentGesture.canonicalize());
 			mCurrentGesture = null;
 
 			// If -1 or 1, play the previous or next song, respectively and
@@ -594,7 +594,7 @@ public final class CoverView extends View implements Handler.Callback {
 	public void setCurrentGesture(MutableGesture newGesture) {
 		if (mCurrentGesture == null || !mCurrentGesture.equals(newGesture)) {
 			this.mCurrentGesture = newGesture;
-			onMidwayGesture(mCurrentGesture);
+			onMidwayGesture(mCurrentGesture.canonicalize());
 		}
 	}
 }

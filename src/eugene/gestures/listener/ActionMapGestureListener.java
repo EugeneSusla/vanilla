@@ -1,5 +1,7 @@
 package eugene.gestures.listener;
 
+import android.util.Log;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,6 +16,7 @@ import eugene.gestures.notification.ShoutNotification;
 import eugene.gestures.notification.MutableTextNotification;
 
 public class ActionMapGestureListener implements GestureListener {
+    private static final String TAG = ActionMapGestureListener.class.getSimpleName();
 
 	private ConcurrentHashMap<ActionableEvent, Action> actionMap = new ConcurrentHashMap<ActionableEvent, Action>();
 	private ConcurrentHashMap<ActionableEvent, Action> midwayGestureActionMap = new ConcurrentHashMap<ActionableEvent, Action>();
@@ -27,10 +30,13 @@ public class ActionMapGestureListener implements GestureListener {
 
 	private boolean invokeActionFromMap(ActionableEvent gesture,
 			Map<ActionableEvent, Action> actionMap) {
-		Action action = actionMap.get(gesture);
-		if (action == null) {
-			return false;
-		}
+        Log.i(TAG, "Received gesture: " + gesture);
+        Action action = actionMap.get(gesture);
+        if (action == null) {
+            Log.i(TAG, "No action to invoke");
+            return false;
+        }
+        Log.i(TAG, "Invoking action: " + action);
 		ShoutNotification resultNotification = action.invoke();
 		if (resultNotification != null) {
 			resultNotification.displayNotification();
@@ -40,11 +46,13 @@ public class ActionMapGestureListener implements GestureListener {
 
 	@Override
 	public boolean onMidwayGesture(ActionableEvent gesture) {
+        Log.i(TAG, "Incoming midway gesture: " + gesture);
 		if (invokeActionFromMap(gesture, midwayGestureActionMap)) {
-			return true;
-		}
+            return true;
+        }
 
-		Action action = actionMap.get(gesture);
+        Log.i(TAG, "No action specified, looking up midway notification...");
+        Action action = actionMap.get(gesture);
 		if (action != null) {
 			if (!gesture.equals(ActionableEvent.TAP)) {
 				midwayGestureNotification.setMessage(action.getDisplayName());

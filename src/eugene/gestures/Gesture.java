@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Gesture extends ActionableEvent {
-	private static ConcurrentHashMap<Stroke, Gesture> mCache = new ConcurrentHashMap<Stroke, Gesture>();
+    public static final List<Stroke> TAP_STROKES = Collections.singletonList(Stroke.STATIC);
+    public static final List<Stroke> LONG_TAP_STROKES = Arrays.asList(Stroke.STATIC, Stroke.STATIC);
+    private static ConcurrentHashMap<Stroke, Gesture> mCache = new ConcurrentHashMap<Stroke, Gesture>();
 
 	protected List<Stroke> gestureStrokes = new ArrayList<Stroke>(
-			Collections.singletonList(Stroke.STATIC));
+            TAP_STROKES);
 
 	public Gesture(List<Stroke> gestureStrokes) {
 		super(null, null);
@@ -40,6 +42,15 @@ public class Gesture extends ActionableEvent {
 	private static Gesture createNewGesture(Stroke... strokes) {
 		return new Gesture(Arrays.asList(strokes));
 	}
+
+    public ActionableEvent canonicalize() {
+        if (gestureStrokes.equals(TAP_STROKES)) {
+            return ActionableEvent.TAP;
+        } else if (gestureStrokes.equals(LONG_TAP_STROKES)) {
+            return ActionableEvent.LONG_TAP;
+        }
+        return this;
+    }
 
 	@Override
 	public String toString() {
