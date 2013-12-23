@@ -289,7 +289,7 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 				showOverlayMessage(R.string.no_songs);
 			} else if ((state & PlaybackService.FLAG_EMPTY_QUEUE) != 0) {
 				showOverlayMessage(R.string.empty_queue);
-			} else {
+            } else {
 				hideMessageOverlay();
 			}
 		}

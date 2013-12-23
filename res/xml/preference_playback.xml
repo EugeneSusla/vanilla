@@ -27,7 +27,7 @@ THE SOFTWARE.
 		android:key="playback_on_startup"
 		android:title="@string/playback_on_startup_title"
 		android:summary="@string/playback_on_startup_summary"
-		android:defaultValue="false" />
+		android:defaultValue="true" />
 	<ch.blinkenlights.android.vanilla.ListPreferenceSummary
 		android:key="display_mode"
 		android:title="@string/display_mode_title"

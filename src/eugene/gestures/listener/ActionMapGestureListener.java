@@ -54,7 +54,7 @@ public class ActionMapGestureListener implements GestureListener {
         Log.i(TAG, "No action specified, looking up midway notification...");
         Action action = actionMap.get(gesture);
 		if (action != null) {
-			if (!gesture.equals(ActionableEvent.TAP)) {
+			if (gesture != ActionableEvent.TAP) {
 				midwayGestureNotification.setMessage(action.getDisplayName());
 				midwayGestureNotification.displayNotification();
 			}

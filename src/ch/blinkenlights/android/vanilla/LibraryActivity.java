@@ -250,7 +250,7 @@ public class LibraryActivity extends PlaybackActivity implements TextWatcher,
 	 */
 	private void checkForLaunch(Intent intent) {
 		SharedPreferences settings = PlaybackService.getSettings(this);
-		if (settings.getBoolean(PrefKeys.PLAYBACK_ON_STARTUP, false)
+		if (settings.getBoolean(PrefKeys.PLAYBACK_ON_STARTUP, true)
 				&& Intent.ACTION_MAIN.equals(intent.getAction())) {
 			startActivity(new Intent(this, FullPlaybackActivity.class));
 		}

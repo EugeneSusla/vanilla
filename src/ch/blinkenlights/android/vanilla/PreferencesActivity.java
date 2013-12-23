@@ -45,8 +45,10 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewFragment;
 import eugene.config.Config;
+import eugene.config.GestureMappingConfig;
 import eugene.gestures.ActionableEvent;
-import eugene.gestures.action.ActionManager;
+import eugene.gestures.action.*;
+import eugene.gestures.action.Action;
 import eugene.instapreferences.InstaPreference;
 
 /**
@@ -202,31 +204,40 @@ public class PreferencesActivity extends PreferenceActivity {
 					unbindedEvents.add(event);
 				}
 			}
-			Collections.sort(bindedEvents);
+            Map<ActionableEvent,Action> deafultMappings =
+                    GestureMappingConfig.getDefaultGestureActionMapping();
+            Collections.sort(bindedEvents);
 			Collections.sort(unbindedEvents);
-			addGesturesCategory("In Use", bindedEvents, preferenceScreen);
-			addGesturesCategory("Unused", unbindedEvents, preferenceScreen);
+			addGesturesCategory("In Use", bindedEvents, preferenceScreen, deafultMappings);
+			addGesturesCategory("Unused", unbindedEvents, preferenceScreen, deafultMappings);
 
 			setPreferenceScreen(preferenceScreen);
 		}
 
-		private void addGesturesCategory(String categoryTitle,
-				List<ActionableEvent> bindedGestures, PreferenceScreen preferenceScreen) {
+		private void addGesturesCategory(
+                String categoryTitle,
+				List<ActionableEvent> bindedGestures,
+                PreferenceScreen preferenceScreen,
+                Map<ActionableEvent, Action> deafultMappings) {
 //			PreferenceGroup category = new PreferenceCategory(getActivity());
 			PreferenceGroup category = preferenceScreen;
 			category.setTitle(categoryTitle);
 			for (ActionableEvent gesture : bindedGestures) {
-				addGesturePreference(category, gesture);
+				addGesturePreference(category, gesture, deafultMappings);
 			}
 //			preferenceScreen.addPreference(category);
 		}
 
 		private void addGesturePreference(PreferenceGroup category,
-				ActionableEvent gesture) {
+				ActionableEvent gesture, Map<ActionableEvent, Action> deafultMappings) {
 			ListPreferenceSummary preference = new ListPreferenceSummary(
 					getActivity(), null);
-			preference.setDefaultValue(eugene.gestures.action.Action.NO_OP
-					.toSettingsString());
+            Action defaultAction = deafultMappings.get(gesture);
+            if (defaultAction == null) {
+//                defaultAction = Action.NO_OP;
+            } else {
+                preference.setDefaultValue(defaultAction.toSettingsString());
+            }
 			preference.setKey(gesture.toSettingsString());
 			preference.setTitle(gesture.toString());
 			// TODO remove these resources
@@ -234,12 +245,9 @@ public class PreferencesActivity extends PreferenceActivity {
 			// getResources().getTextArray(R.array.swipe_action_entries);
 			// CharSequence[] vanillaActionValues =
 			// getResources().getTextArray(R.array.swipe_action_values);
-			Map<String, String> knownActions = ActionManager.INSTANCE
-					.getKnownActions();
-			String[] values = knownActions.keySet().toArray(
-					new String[knownActions.size()]);
-			String[] entries = knownActions.values().toArray(
-					new String[knownActions.size()]);
+			Map<String, String> knownActions = ActionManager.INSTANCE.getKnownActions();
+			String[] values = knownActions.keySet().toArray(new String[knownActions.size()]);
+			String[] entries = knownActions.values().toArray(new String[knownActions.size()]);
 			preference.setEntryValues(values);
 			preference.setEntries(entries);
 			category.addPreference(preference);

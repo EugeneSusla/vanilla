@@ -19,7 +19,7 @@ import eugene.utils.FolderFilteringUtils;
 public enum Config {
 	INSTANCE;
 
-	private int gestureStrokeMinPixelThreshold = 10;
+	private int gestureStrokeMinPixelThreshold = 7;
 	@Hide
 	private ShoutNotification unrecognisedGestureNotification = new MutableTextNotification(
 			"Unrecognized Gesture");
