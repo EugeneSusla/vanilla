@@ -30,6 +30,7 @@ THE SOFTWARE.
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:layout_gravity="top"
+        android:paddingTop="30dp"
 		android:background="#a000"
 		android:orientation="horizontal">
 		<TextView

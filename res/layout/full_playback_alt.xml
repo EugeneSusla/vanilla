@@ -35,7 +35,8 @@ THE SOFTWARE.
 		android:shrinkColumns="1"
 		android:background="#a000"
 		android:paddingLeft="5dip"
-		android:paddingRight="5dip">
+		android:paddingRight="5dip"
+        android:paddingTop="30dp">
 		<TableRow>
 			<TextView
 				android:text="@string/_title"

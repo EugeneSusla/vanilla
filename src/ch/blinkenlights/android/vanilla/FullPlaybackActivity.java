@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -130,6 +131,12 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 
 		int layout = R.layout.full_playback;
 		int coverStyle;
+
+        WindowManager.LayoutParams attributes = getWindow().getAttributes();
+        attributes.flags |=
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+        getWindow().setAttributes(attributes);
 
 		switch (displayMode) {
 		default:
@@ -501,19 +508,29 @@ public class FullPlaybackActivity extends PlaybackActivity implements
 		updateLowProfileDim();
 	}
 
-	private void updateLowProfileDim() {
-		boolean lowProfileToggleEnabled = Config.INSTANCE.isUseLowProfileInCompactMode();
-		if (mControlsVisible) {
-			if (lowProfileToggleEnabled
-					|| ((getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0)) {
-				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-			}
-		} else {
-			if (lowProfileToggleEnabled) {
-				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-			}
-		}
-	}
+    private void updateLowProfileDim() {
+        boolean lowProfileToggleEnabled = Config.INSTANCE.isUseLowProfileInCompactMode();
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        if (mControlsVisible) {
+            if (lowProfileToggleEnabled
+                    || ((decorView.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0)) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            }
+            if (Config.INSTANCE.isHideNotificationBarInCompactMode()) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+        } else {
+            if (lowProfileToggleEnabled) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+            }
+            if (Config.INSTANCE.isHideNotificationBarInCompactMode()) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            }
+        }
+    }
 
 	/**
 	 * Set the visibility of the extra metadata view.

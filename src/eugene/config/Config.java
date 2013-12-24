@@ -34,7 +34,7 @@ public enum Config {
 	/** This may require restart */
 	private boolean hideActionBarOnPlaybackScreen = true; // default false
 	@Title("TEST TITLE")
-	private boolean hideNotificationBarInCompactMode = false;  // default false
+	private boolean hideNotificationBarInCompactMode = true;  // default false
 	/**
 	 * 0 to 1 (percentage of total height)
 	 */
